@@ -1,0 +1,59 @@
+# Virtual environments
+venv/
+.env/
+.envrc
+.venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+
+# Test caches
+.pytest_cache/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# IDE-specific files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Secrets and environment files
+*.env
+*.secret
+secrets.yaml
+
+# Downloaded raw data
+data/raw/
+
+# Processed data
+data/processed/
+
+# Split manifests
+# Keep the splits directory tracked so reproducible split manifests can be committed.
+# Do not ignore the entire data/splits/ folder; keep manifest files under version control.
+# (Individual large artifacts derived from splits may be ignored separately.)
+
+
+# Embedding caches
+embeddings_cache/
+*.embeddings.npy
+
+# Model checkpoints
+checkpoints/
+models/*.pt
+models/*.pth
+
+# Generated temporary artifacts
+tmp/
+temp/
+*.log
+*.bak
+
+# Keep placeholders by committing .gitkeep files in tracked directories.

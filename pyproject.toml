@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "neural-hallucination-detector"
+version = "0.0.0"
+description = "Neural Hallucination Detector (research experiment) - Phase 0"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+  { name = "Copilot CLI" }
+]
+# Keep dependencies empty here to avoid duplication with requirements.txt
+dependencies = []

@@ -1,0 +1,62 @@
+# Default experiment configuration (single source of truth for Phase 0)
+# Locked settings from PROJECT_PLAN.md and AGENTS.md
+
+labels:
+  grounded: 0  # 0 = Grounded
+  hallucinated: 1  # 1 = Hallucinated (positive class)
+
+split:
+  train: 0.70
+  validation: 0.15
+  test: 0.15
+  seed: 42  # Documented split seed
+
+mlp_seeds:
+  - 101
+  - 202
+  - 303  # Three documented MLP seeds
+
+encoder:
+  model: "sentence-transformers/all-MiniLM-L6-v2"
+  embedding_dim: 384
+  normalized: true
+
+context_chunking:
+  max_chunk_tokens: 192
+  chunk_overlap_tokens: 32
+
+primary_features:
+  interaction_blocks: 4
+  interaction_block_dim: 384
+  scalar_features:
+    - max_answer_context_cosine
+    - mean_top3_answer_context_cosine
+    - question_answer_cosine
+    - max_question_context_cosine
+    - answer_content_token_coverage
+    - answer_numeric_token_coverage
+    - answer_has_numeric_token
+  total_dim: 1543
+
+mlp:
+  architecture: [1543, 256, 64, 1]
+  activation: ReLU
+  dropout:
+    - 0.20
+    - 0.10
+  loss: BCEWithLogitsLoss
+  optimizer: AdamW
+  learning_rate: 1e-3
+  weight_decay: 1e-4
+  batch_size: 128
+  max_epochs: 30
+  early_stopping_patience: 5
+
+training:
+  primary_metric: hallucinated_f1
+
+notes:
+  - "Primary feature vector = 4 * 384 + 7 = 1543"
+  - "Encoder remains frozen. Do not fine-tune the sentence-transformer model."
+  - "Split original records before paired expansion."
+  - "Test data must not guide development decisions."
