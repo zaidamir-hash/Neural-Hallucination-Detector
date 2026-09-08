@@ -1,287 +1,358 @@
 # AGENTS.md
 
-## Project Authority
+## 1. Repository Status
 
-Before modifying this repository, read `PROJECT_PLAN.md` completely.
+This is an existing research repository.
 
-`PROJECT_PLAN.md` is the methodological source of truth. This file defines the operating rules for coding agents.
+Do not assume it is empty or newly created.
 
-If this file, a user request, existing code, and `PROJECT_PLAN.md` appear inconsistent, stop and report the conflict. Do not silently choose an interpretation or change the research protocol.
+Before modifying anything:
 
-## Project Goal
+1. Read `PROJECT_PLAN.md` completely.
+2. Read this file completely.
+3. Inspect the current repository.
+4. Inspect Git status and recent history.
+5. Identify existing source files, tests, configurations, manifests, and results.
+6. Determine the completion status of every project phase.
+7. Report the current state before making changes.
+8. Wait for confirmation before implementing the next phase.
 
-Build a focused and reproducible research experiment that compares:
+Preserve valid existing work. Do not recreate completed phases without evidence that they are defective.
 
-1. An answer-context cosine-similarity threshold
-2. Logistic Regression using engineered embedding features
-3. A lightweight PyTorch MLP using the same primary features
+## 2. Authority
 
-The project is limited to the HaluEval QA benchmark.
+`PROJECT_PLAN.md` is the methodological source of truth.
 
-The objective is experimental validity, reproducibility, and honest comparison—not obtaining a preferred result.
+`AGENTS.md` defines implementation conduct.
 
-## Phase Discipline
+The current user prompt defines the authorized phase or inspection task.
 
-- Work only on the phase explicitly named in the current prompt.
-- Read that phase and its acceptance criteria in `PROJECT_PLAN.md` before beginning.
-- Do not implement future phases early.
-- Stop after completing the requested phase.
+If the current code, configuration, user prompt, `PROJECT_PLAN.md`, and this file conflict, stop and report:
+
+1. The conflicting requirements
+2. Existing repository evidence
+3. The smallest proposed resolution
+4. Methodological consequences
+
+Do not silently resolve methodology conflicts.
+
+## 3. Role of the Implementation Agent
+
+The implementation agent may:
+
+- Inspect the repository
+- Implement the explicitly authorized phase
+- Add or modify tests within that phase
+- Run relevant commands and tests
+- Update documentation for completed factual work
+- Fix defects within the authorized phase
+- Report results and blockers
+
+The implementation agent must not:
+
+- Begin unrequested phases
+- Rewrite completed valid work
+- Change the research protocol silently
+- Fabricate metrics, results, files, or command outcomes
+- Use test results for development decisions
+- Implement optional extensions without authorization
+
+## 4. Phase Discipline
+
+- Work on one explicitly authorized phase at a time.
+- Read the phase and acceptance criteria before starting.
+- Inspect dependencies from earlier phases.
+- Reuse valid existing utilities.
+- Avoid unrelated refactors.
+- Stop after the requested phase.
+- Report completion before committing when review is requested.
 - Do not automatically continue to the next phase.
-- Keep the implementation achievable within six days.
-- Prefer the smallest design that satisfies the current acceptance criteria.
-- Optional extensions are out of scope unless explicitly requested.
-- Do not prioritize the demo over the research experiment.
 
-## Locked Research Decisions
+File presence alone does not establish phase completion. Verify behavior, tests, and artifacts.
 
-The following decisions are locked and must not be changed silently:
+## 5. Locked Methodology
 
-- Dataset: official HaluEval QA subset
+Do not silently change:
+
+- Dataset: official HaluEval QA
 - Label convention: `0 = Grounded`, `1 = Hallucinated`
-- Positive evaluation class: Hallucinated
-- Split proportions: 70% train, 15% validation, 15% test
-- Split original records before paired expansion
-- Keep both answers from every source record in the same split
-- Use a fixed and documented split seed
-- Sentence encoder: `sentence-transformers/all-MiniLM-L6-v2`
-- Sentence encoder remains frozen
+- Positive class: Hallucinated
+- Split proportions: 70/15/15
+- Split seed from the canonical configuration
+- Split original records before expansion
+- Duplicate normalized contexts remain in one split
+- Both paired examples remain in one split
+- Encoder: `sentence-transformers/all-MiniLM-L6-v2`
+- Encoder remains frozen
 - Embedding dimension: 384
+- L2 embedding normalization
 - Context chunk size: 192 model tokens
-- Context chunk overlap: 32 model tokens
-- Primary feature dimension: 1,543
-- Primary vector features:
-  - `|a - ca|`
-  - `a element-wise-product ca`
-  - `|q - a|`
-  - `q element-wise-product a`
-- Primary scalar features:
-  - Maximum answer-context-chunk cosine similarity
-  - Mean of the top three answer-context-chunk similarities
-  - Question-answer cosine similarity
-  - Maximum question-context-chunk cosine similarity
-  - Answer content-token coverage in the context
-  - Answer numeric-token coverage in the context
-  - Indicator that the answer contains a numeric token
+- Context overlap: 32 model tokens
+- Four primary interaction blocks
+- Seven primary scalar features
+- Total primary dimension: 1,543
+- Same primary features for Logistic Regression and MLP
 - MLP architecture: `1543 -> 256 -> 64 -> 1`
-- Hidden activation: ReLU
-- Dropout values: 0.20 and 0.10
+- ReLU activations
+- Dropout: 0.20 and 0.10
 - Loss: `BCEWithLogitsLoss`
 - Optimizer: AdamW
-- Initial learning rate: `1e-3`
+- Learning rate: `1e-3`
 - Weight decay: `1e-4`
 - Batch size: 128
 - Maximum epochs: 30
 - Early-stopping patience: 5
 - Early-stopping criterion: validation loss
-- Number of core MLP seeds: 3
+- Three core MLP seeds
 - Primary metric: hallucinated-class F1
-- Test data must not guide development decisions
+- Validation-only tuning
+- Locked test-set policy
+- Style/length-only negative control
+- Shuffled-context sanity test
+- Qualitative high-confidence error analysis
 
-Question-context interaction vector blocks are optional and are not part of the locked primary architecture.
+## 6. Primary Feature Contract
 
-Cluster-bootstrap confidence intervals, calibration, additional ablations, extra MLP seeds, shuffled-context testing, and the demo are optional extensions.
+The primary feature vector is:
 
-## Leakage Prevention
+- `|a - c_a|`
+- `a ⊙ c_a`
+- `|q - a|`
+- `q ⊙ a`
 
-The required dataset order is:
+Each block has 384 dimensions.
 
-1. Load original HaluEval records.
-2. Validate original records.
-3. Assign stable source identifiers.
-4. Audit duplicates.
-5. Split original records into train, validation, and test groups.
-6. Expand each split into grounded and hallucinated rows.
+Required scalar features:
 
-Never split the expanded classification rows independently.
+1. Maximum answer-context-chunk cosine similarity
+2. Mean top-three answer-context-chunk similarity
+3. Question-answer cosine similarity
+4. Maximum question-context-chunk similarity
+5. Answer content-token coverage in context
+6. Answer numeric-token coverage in context
+7. Numeric-token presence indicator
 
-Automated tests must verify:
+Total dimension: 1,543.
 
-- No source identifier crosses splits.
-- Both expanded examples from a source record remain together.
-- Every retained source record creates exactly two rows.
-- No known exact-duplicate group crosses splits.
-- Every split remains balanced.
-- Reusing the same seed reproduces the same split manifest.
+Do not add length or style features to this primary representation.
 
-## Test-Set Protection
+Question-context vector interactions are optional and require explicit authorization.
+
+## 7. Leakage Prevention
+
+The required processing order is:
+
+1. Validate original records.
+2. Assign stable source IDs.
+3. Audit duplicates.
+4. Group duplicate normalized contexts.
+5. Split original records.
+6. Save the split manifest.
+7. Expand records within their assigned splits.
+
+Never split expanded rows independently.
+
+Required assertions:
+
+- No source ID crosses splits.
+- No duplicate-context group crosses splits.
+- Both variants of each source remain together.
+- Every valid source appears exactly once in the manifest.
+- Every source produces exactly two expanded rows.
+- Each expanded split is balanced.
+- Example IDs are unique.
+- Manifest generation is deterministic.
+
+## 8. Test-Set Protection
 
 Never use test data to:
 
 - Select features
-- Fit a scaler or preprocessing transformation
-- Select the cosine threshold
+- Fit preprocessing
+- Fit the scaler
+- Select cosine thresholds
 - Select Logistic Regression regularization
-- Select MLP hyperparameters
+- Tune the MLP
 - Control early stopping
-- Select a checkpoint
-- Select a classification threshold
-- Select the representative MLP seed
-- Decide whether an optional extension should be retained
+- Select checkpoints
+- Select classification thresholds
+- Select the representative seed
+- Decide whether an extension should be retained
 
-Use training data to fit model parameters and fitted transformations.
+Use:
 
-Use validation data for model selection, threshold selection, and early stopping.
+- Training data for fitting
+- Validation data for selection and thresholds
+- Test data only for locked final evaluation and prespecified sanity analysis
 
-Use test data only for locked final evaluation.
+Do not repeatedly inspect test results during development.
 
-If a genuine implementation defect is discovered after final test evaluation, document:
+## 9. Core Diagnostics
 
-1. The defect
-2. Its effect
-3. The correction
-4. Why reevaluation was necessary
+### Style/length negative control
 
-Do not silently replace results.
+The negative control must use answer-only surface features.
 
-## Shortcut Awareness
+It must not receive question or context information.
 
-Correct and hallucinated HaluEval answers may differ systematically in length and style.
+Report it separately from the three primary models.
 
-The core dataset audit must examine possible shortcut features, including:
+### Shuffled-context test
 
-- Answer token count
-- Answer character count
-- Sentence count
-- Numeric-token frequency
-- Answer-context lexical coverage
-- Answer-context cosine similarity
-- Exact answer occurrence in the context
+Run only after primary evaluation is locked.
 
-Standalone answer length and stylistic features must not be added to the primary feature vector.
+Do not retrain or retune models.
 
-Do not interpret benchmark performance as proof of general real-world hallucination detection.
+Preserve answer pairs and ensure no source retains its own context.
 
-## Implementation Standards
+A performance drop is expected but not required. Report the observed result honestly.
+
+## 10. Optional Work
+
+The following require explicit authorization:
+
+- Extended question-context vector interactions
+- Bootstrap confidence intervals
+- More than three MLP seeds
+- Calibration
+- Extra ablations
+- Pairwise metrics
+- Near-duplicate semantic clustering
+- Demo
+- Deployment
+
+Do not implement optional work simply because time appears available.
+
+## 11. Implementation Standards
 
 - Use Python.
 - Use PyTorch for the MLP.
-- Use sentence-transformers for frozen embeddings.
-- Use scikit-learn for baselines, scaling, and evaluation utilities.
+- Use sentence-transformers for embeddings.
+- Use scikit-learn for baselines and evaluation utilities.
 - Use pandas and NumPy for data processing.
-- Use matplotlib or compatible lightweight plotting tools for figures.
-- Keep reusable logic inside `src/hallucination_detector`.
-- Do not place the reproducible pipeline exclusively in notebooks.
-- Use notebooks only for focused exploration or presentation.
-- Centralize experiment settings in a configuration file.
-- Avoid duplicated configuration constants.
-- Use type hints where they improve clarity.
-- Add concise docstrings to public functions and classes.
-- Validate data at external boundaries.
-- Raise informative errors for malformed records and incompatible caches.
-- Prefer simple functions and modules over unnecessary abstractions.
-- Avoid adding dependencies without a clear project requirement.
+- Use matplotlib or another lightweight plotting tool.
+- Keep reusable logic under `src/hallucination_detector`.
+- Keep scripts thin; scripts should call package functions.
+- Do not place the reproducible pipeline only in notebooks.
+- Centralize configuration.
+- Avoid duplicated constants.
+- Prefer simple functions and modules.
+- Add useful type hints and concise docstrings.
+- Validate external data at boundaries.
+- Raise informative errors.
+- Avoid unnecessary dependencies and frameworks.
 
-## Prohibited Additions
+## 12. Existing Work Protection
 
-Do not add:
+Before editing an existing file:
 
-- Paid APIs
-- External LLM API calls
-- Cloud-only services
-- Databases
-- Distributed training infrastructure
-- Large-model fine-tuning
-- Unrequested web services
-- Production deployment infrastructure
-- Complex configuration frameworks
-- Large hyperparameter-search frameworks
-- Unrequested optional extensions
-- Invented metrics or results
+1. Read it.
+2. Understand its callers and tests.
+3. Preserve valid behavior.
+4. Avoid formatting-only rewrites.
+5. Avoid unrelated refactors.
+6. Explain necessary structural changes.
 
-## Repository Hygiene
+Never overwrite `PROJECT_PLAN.md` with a summary.
 
-Do not commit:
+Never weaken `AGENTS.md`.
 
-- Downloaded datasets unless their license and project policy explicitly permit it
-- Virtual environments
-- Python caches
-- Embedding caches
-- Model checkpoints
-- Temporary files
-- Secrets or API keys
-- Local IDE state
-- Generated artifacts that are large and reproducible
+Never delete valid artifacts merely because they were created by another agent.
 
-Keep generated results separate from source code.
+If an existing implementation satisfies an acceptance criterion, reuse it.
 
-Preserve:
-
-- Dataset provenance
-- Dataset checksum
-- Split manifest
-- Random seeds
-- Experiment configuration
-- Cache metadata
-- Selected validation thresholds
-- Model settings
-- Machine-readable evaluation results
-
-## Testing Rules
+## 13. Testing
 
 - Add or update tests for every implemented phase.
-- Use small synthetic fixtures for routine unit tests.
-- Routine unit tests must not require downloading HaluEval.
-- Routine unit tests must not require downloading the sentence-transformer model.
-- Mock or inject heavyweight external components where appropriate.
-- Run relevant tests before declaring a phase complete.
-- Report skipped tests and explain why they were skipped.
-- Do not weaken or delete valid tests merely to make a task pass.
+- Use small synthetic fixtures for routine tests.
+- Routine tests must not require downloading HaluEval or MiniLM.
+- Mock network access where appropriate.
+- Do not weaken valid tests to make changes pass.
+- Report skipped tests and warnings.
+- Run the complete relevant test suite before declaring completion.
 
 Prioritize tests for:
 
-- Label consistency
-- Stable source identifiers
-- Split reproducibility
-- Leakage prevention
-- Paired expansion
-- Feature dimensions
-- Context chunking
-- Train-only fitting
+- Schema validation
+- Stable IDs
+- Duplicate grouping
+- Split determinism
+- Leakage assertions
+- Label correctness
+- Context chunk boundaries
+- Feature dimension
+- Train-only scaling
 - Cache compatibility
 - Metric direction
-- Deterministic behavior
+- Threshold selection
+- MLP shape and determinism
+- Shuffled-context integrity
 
-## Existing Work
+## 14. Git and Artifact Safety
 
-Before modifying existing files:
+Before committing:
 
-1. Inspect their current contents.
-2. Preserve valid work from earlier phases.
-3. Avoid unrelated rewrites.
-4. Explain any necessary structural change.
-5. Do not overwrite `PROJECT_PLAN.md` with a summary.
-6. Do not weaken `AGENTS.md`.
+- Inspect `git status`.
+- Review every staged file.
+- Confirm raw data is ignored.
+- Confirm secrets and environments are ignored.
+- Confirm caches and large checkpoints are ignored.
+- Keep lightweight provenance, manifests, metrics, and figures trackable.
+- Do not commit generated junk or machine-specific absolute paths.
 
-Do not edit completed experimental results unless the current task explicitly requires it.
+Do not rewrite history, force-push, delete branches, or remove user work without explicit authorization.
 
-## Change-Control Procedure
+## 15. Change-Control Procedure
 
-If a locked requirement appears technically impossible, internally inconsistent, or clearly defective, stop before changing it.
+If a locked decision appears defective:
 
-Report:
+1. Stop before changing it.
+2. Identify the exact requirement.
+3. Provide evidence.
+4. Propose the smallest correction.
+5. Explain its methodological impact.
+6. Explain which artifacts would need regeneration.
+7. Wait for approval.
 
-1. The affected requirement
-2. Evidence demonstrating the problem
-3. The smallest proposed correction
-4. Its effect on methodology and reproducibility
-5. Whether existing artifacts would need regeneration
+Minor implementation choices that do not alter methodology may be made and reported normally.
 
-Wait for explicit approval before making the change.
+## 16. Required Status Report
 
-Minor implementation details that do not alter the methodology may be decided normally and documented in the completion report.
+For repository inspection, report:
 
-## Required Phase Completion Report
+1. Repository root and current branch
+2. Git status and recent relevant commits
+3. Existing files and directory structure
+4. Canonical configuration values
+5. Status of every phase:
+   - Complete
+   - Partial
+   - Not started
+   - Unclear
+6. Evidence supporting each status
+7. Existing tests and results
+8. Test execution outcome, if safely run
+9. Methodology inconsistencies or defects
+10. First incomplete phase
+11. Recommended next action
 
-At the end of every phase, stop and report:
+Do not modify files during an inspection-only task.
 
-1. Files created or changed
-2. Important implementation decisions
-3. Commands executed
-4. Tests executed and their outcomes
-5. Acceptance criteria satisfied
-6. Acceptance criteria not satisfied
-7. Assumptions made
-8. Warnings or unresolved issues
-9. Recommended next phase
+## 17. Required Phase Completion Report
 
-Do not begin the recommended next phase until explicitly requested.
+After implementing an authorized phase, report:
+
+1. Files created, modified, or deleted
+2. Existing files reused
+3. Important implementation decisions
+4. Commands executed
+5. Tests and outcomes
+6. Generated artifacts and results
+7. Acceptance criteria satisfied
+8. Acceptance criteria not satisfied
+9. Assumptions
+10. Warnings or unresolved issues
+11. Git status
+12. Recommended next phase
+
+Stop after reporting.

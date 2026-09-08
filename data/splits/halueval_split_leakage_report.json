@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "every_valid_phase1_source_id_appears_once": true,
+    "no_unknown_or_missing_source_ids": true,
+    "no_source_id_crosses_splits": true,
+    "no_duplicate_context_group_crosses_splits": true,
+    "both_examples_from_source_in_same_split": true,
+    "every_source_produces_exactly_two_examples": true,
+    "every_split_balanced_grounded_hallucinated": true,
+    "labels_are_0_grounded_1_hallucinated": true,
+    "example_ids_unique_and_deterministic": true,
+    "same_seed_reproduces_manifest": true
+  },
+  "all_passed": true,
+  "split_manifest_count": 10000,
+  "expanded_row_count": 20000
+}

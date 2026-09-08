@@ -1,0 +1,22 @@
+{
+  "dataset_checksum": "89ed139ec5e3a3169a0b30e45569ac1283846f76f27f7bb5e908ee6deed57e88",
+  "source_revision": "207f479c555a68b8d2431631a95083b84b2accbe",
+  "split_seed": 42,
+  "requested_proportions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "achieved_counts": {
+    "train": 7000,
+    "validation": 1500,
+    "test": 1500
+  },
+  "achieved_proportions": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "grouping_rule": "Group by SHA-256(normalize_text(knowledge)); assign groups to splits deterministically with seed.",
+  "creation_timestamp_utc": "2026-09-07T20:16:15.113573Z"
+}

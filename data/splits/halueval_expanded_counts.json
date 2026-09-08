@@ -1,0 +1,22 @@
+{
+  "total_expanded_rows": 20000,
+  "by_split": {
+    "train": 14000,
+    "validation": 3000,
+    "test": 3000
+  },
+  "by_split_and_label": {
+    "train": {
+      "grounded_label_0": 7000,
+      "hallucinated_label_1": 7000
+    },
+    "validation": {
+      "grounded_label_0": 1500,
+      "hallucinated_label_1": 1500
+    },
+    "test": {
+      "grounded_label_0": 1500,
+      "hallucinated_label_1": 1500
+    }
+  }
+}

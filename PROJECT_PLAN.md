@@ -1,6 +1,32 @@
-# PROJECT PLAN: Neural Hallucination Detection for Large Language Model Responses
+# PROJECT_PLAN.md
 
-## 1. Project Overview
+# Neural Hallucination Detection for Large Language Model Responses
+
+## 1. Project Status and Resumption Rule
+
+This is an existing project previously implemented in part by GitHub Copilot Agent.
+
+It is not a fresh repository.
+
+Before continuing implementation, any new coding agent must:
+
+1. Read this document completely.
+2. Read `AGENTS.md` completely.
+3. Inspect the existing repository.
+4. Examine Git history and working-tree status.
+5. Identify existing code, tests, configurations, data artifacts, and results.
+6. Determine which project phases are complete, partial, not started, or inconsistent.
+7. Report its findings before modifying files.
+8. Preserve valid existing work.
+9. Continue from the first incomplete phase only after user confirmation.
+
+File presence alone does not prove that a phase is complete. Completion requires evidence that the applicable acceptance criteria are satisfied.
+
+Do not rebuild completed phases unnecessarily.
+
+---
+
+## 2. Project Overview
 
 This project investigates whether a lightweight neural classifier can distinguish grounded answers from hallucinated answers when given:
 
@@ -8,370 +34,432 @@ This project investigates whether a lightweight neural classifier can distinguis
 - A reference context
 - A candidate answer
 
-The project uses the HaluEval question-answering subset and is designed as a small, reproducible research experiment rather than a production hallucination detector or application-focused demo.
+The project uses the HaluEval question-answering subset and is framed as a small, reproducible research experiment.
 
-The central comparison is between:
+The main comparison is between:
 
-1. A cosine-similarity threshold baseline
-2. A Logistic Regression baseline
-3. A lightweight PyTorch multilayer perceptron (MLP)
+1. An answer-context cosine-similarity threshold
+2. Logistic Regression over engineered frozen-embedding features
+3. A lightweight PyTorch multilayer perceptron over the same primary representation
 
-The sentence-embedding model will remain frozen. No large language model or transformer will be fine-tuned.
+The project also includes:
+
+- A style/length-only negative-control classifier
+- A shuffled-context sanity test
+- A qualitative analysis of high-confidence errors
+
+The sentence encoder remains frozen. No transformer or large language model is fine-tuned.
 
 ---
 
-## 2. Research Question
+## 3. Research Question
 
-On paired HaluEval-QA examples, does a lightweight nonlinear MLP trained on frozen sentence-embedding interaction features detect hallucinated answers more effectively than an answer-context cosine threshold and Logistic Regression using comparable features?
+On paired HaluEval-QA examples, does a lightweight nonlinear MLP trained on frozen sentence-embedding interaction features detect hallucinated answers more effectively than an answer-context cosine threshold and Logistic Regression using the same primary feature representation?
 
 ### Primary hypothesis
 
-The MLP will achieve higher hallucinated-class F1 and ROC-AUC than the cosine-similarity baseline because it can learn nonlinear relationships between the question, candidate answer, and supporting context.
+The MLP may achieve higher hallucinated-class F1 and ROC-AUC than the cosine baseline because it can learn nonlinear relationships among answer-context and question-answer interactions.
 
 ### Secondary hypothesis
 
-The MLP may outperform Logistic Regression if the relevant embedding interactions are not linearly separable.
+The MLP may outperform Logistic Regression if the engineered interaction representation is not linearly separable.
 
-### Null or negative result
+### Negative-result policy
 
-If Logistic Regression matches or outperforms the MLP, the experiment is still considered successful.
+The project remains successful if Logistic Regression matches or outperforms the MLP.
 
-Such a result would suggest that nonlinear classification adds limited value for this feature representation or that benchmark artifacts dominate the task.
+A negative result may indicate that:
+
+- The representation is largely linearly separable.
+- The MLP adds unnecessary complexity.
+- Benchmark artifacts dominate the task.
+- The frozen embedding representation does not capture the required factual distinctions.
 
 No minimum performance improvement is required for project completion.
 
 ---
 
-## 3. Scope and Claims
+## 4. Claims and Interpretation Boundary
 
-### In scope
+Final conclusions must be limited to the paired HaluEval-QA benchmark.
 
-- HaluEval QA acquisition and validation
-- Leakage-safe paired dataset construction
-- Exploratory dataset and shortcut analysis
-- Frozen sentence embeddings
-- Context chunking
-- Engineered embedding-interaction features
-- Cosine-similarity baseline
-- Logistic Regression baseline
-- Lightweight PyTorch MLP
-- Reproducible training and evaluation
-- Quantitative model comparison
-- Qualitative error analysis
-- Clear research documentation
-- Optional minimal local demo
+The project must not claim that benchmark performance establishes reliable hallucination detection for:
 
-### Out of scope
+- Arbitrary LLM responses
+- Unseen domains
+- Different answer-generation styles
+- Real-world class distributions
+- Production deployments
 
-- Fine-tuning sentence transformers or large language models
-- Paid APIs
-- External LLM APIs
-- Generating new hallucinated answers
-- Multi-dataset generalization experiments
-- Production deployment
-- Claim-level hallucination localization
-- Retrieval-augmented generation
-- Complex hyperparameter optimization
-- Formal human evaluation
-- Claims of general real-world hallucination detection
+All three primary approaches use representations produced by a pretrained neural sentence encoder.
 
-### Interpretation boundary
+The comparison must therefore be described as:
 
-The final conclusions must be limited to the paired HaluEval-QA benchmark.
+- A threshold rule over frozen neural embeddings
+- A linear classifier over frozen neural features
+- A nonlinear neural classifier over frozen neural features
 
-The project must not claim that strong benchmark performance proves reliable hallucination detection for arbitrary LLMs, domains, answer styles, or real-world class distributions.
-
-Because every primary method uses frozen neural sentence embeddings, the comparison should be described as:
-
-- Threshold-based classification over frozen embeddings
-- Linear classification over frozen embedding features
-- Nonlinear neural classification over frozen embedding features
-
-It should not be described as a completely neural system versus completely non-neural systems.
+It must not be described as an entirely neural method versus entirely non-neural methods.
 
 ---
 
-## 4. Dataset
+## 5. Core Requirements
 
-### 4.1 Source
+The following are required for project completion:
 
-Use the official HaluEval QA data.
+- Official HaluEval QA acquisition with provenance
+- Dataset checksum and pinned source revision
+- Original-record validation
+- Stable deterministic source IDs
+- Duplicate and shortcut-artifact audit
+- Original-record splitting before paired expansion
+- Duplicate-context-aware train/validation/test grouping
+- No source or duplicate-context group crossing splits
+- Frozen `sentence-transformers/all-MiniLM-L6-v2` encoder
+- Token-aware context chunking
+- Locked 1,543-dimensional primary feature representation
+- Cosine-similarity threshold baseline
+- Logistic Regression over the primary representation
+- Style/length-only negative control
+- Lightweight PyTorch MLP
+- Three documented MLP seeds
+- Validation-only tuning and threshold selection
+- Locked final test evaluation
+- Accuracy, precision, recall, F1, ROC-AUC, and confusion matrices
+- ROC and precision-recall curves
+- Shuffled-context sanity test
+- High-confidence false-positive and false-negative analysis
+- Reproducible commands, configurations, manifests, and results
+- Polished README with an honest results table and limitations
 
-Primary references:
+---
+
+## 6. Optional Extensions
+
+The following are optional and must not delay the core experiment:
+
+- Question-context interaction vector blocks:
+  - `|q - c_q|`
+  - `q ⊙ c_q`
+- Cluster-bootstrap confidence intervals
+- More than three MLP seeds
+- Calibration analysis
+- Temperature scaling
+- Brier score or expected calibration error
+- Additional feature ablations
+- Pairwise ranking accuracy
+- Pair-consistency accuracy
+- Near-duplicate semantic clustering
+- Cross-dataset evaluation
+- Minimal Streamlit or Gradio demo
+
+Optional extensions must be:
+
+- Clearly separated from primary results
+- Added only after the core experiment is complete
+- Documented as extensions or ablations
+- Excluded if they threaten the project schedule
+
+---
+
+## 7. Dataset
+
+### 7.1 Source
+
+Use the official HaluEval QA dataset.
+
+References:
 
 - Repository: https://github.com/RUCAIBox/HaluEval
 - Paper: https://aclanthology.org/2023.emnlp-main.397/
 
-Each original QA record is expected to contain:
+Expected original fields:
 
 - `question`
 - `knowledge`
 - `right_answer`
 - `hallucinated_answer`
 
-The repository must record:
+Use an official revision-pinned dataset URL when available.
 
-- Dataset source URL
+Record:
+
+- Official repository
+- Exact source revision
+- Exact download URL
 - Download date
-- Dataset file checksum
-- Number of raw records
-- Number of valid records
-- Number of excluded records
-- Reasons for exclusions
-- License information
-- Citation information
+- SHA-256 checksum
+- Raw file size
+- Raw record count
+- Required schema
+- License
+- Paper citation
 
-Raw data must not be silently modified.
+Raw downloaded data must not be silently modified.
 
-### 4.2 Labels
+### 7.2 Labels
 
-Use the following fixed label convention:
+The locked label convention is:
 
 - `0 = Grounded`
 - `1 = Hallucinated`
 
-The hallucinated class is the positive class for precision, recall, and F1 reporting.
+Hallucinated is the positive class for precision, recall, and F1.
 
-### 4.3 Paired expansion
+### 7.3 Paired expansion
 
-Every valid original record produces exactly two classification examples:
+Every valid source record produces two examples:
 
 1. `question + knowledge + right_answer -> Grounded`
 2. `question + knowledge + hallucinated_answer -> Hallucinated`
 
-Each expanded row must retain the `source_id` of its original record.
-
-### 4.4 Stable source identifiers
-
-If the source dataset does not provide a reliable unique identifier, create a deterministic identifier from a stable hash of the original record fields.
-
-The identifier must be created before dataset expansion and must remain reproducible across runs.
+Both examples must retain the same `source_id` and split assignment.
 
 ---
 
-## 5. Leakage Prevention and Dataset Splitting
+## 8. Data Validation and Stable IDs
 
-### 5.1 Required processing order
+Validate original records before splitting.
 
-The dataset must be split at the original-record level before paired expansion.
+Detect and report:
 
-Required order:
-
-1. Load original HaluEval records.
-2. Validate records using documented rules.
-3. Assign stable `source_id` values.
-4. Audit exact duplicates.
-5. Split original records into training, validation, and test groups.
-6. Expand the records within each split into grounded and hallucinated rows.
-
-The expanded rows must never be randomly split independently.
-
-### 5.2 Split proportions
-
-Use:
-
-- 70% training records
-- 15% validation records
-- 15% test records
-
-Use one fixed and documented split seed.
-
-Because every source record contributes one example from each class, every split should be balanced.
-
-Records must be validated before splitting so that later removal does not disturb this balance.
-
-### 5.3 Duplicate handling
-
-Before splitting, audit:
-
+- Non-object records
+- Missing required fields
+- Null fields
+- Non-string fields
+- Empty or whitespace-only fields
+- Identical grounded and hallucinated answers after documented normalization
 - Exact duplicate records
 - Duplicate normalized questions
-- Duplicate contexts
-- Duplicate question-context combinations
-- Identical grounded and hallucinated answers
-- Empty or malformed fields
+- Duplicate normalized contexts
+- Duplicate normalized question-context pairs
 
-Exact duplicate records should be removed or assigned to the same split group.
+Do not silently repair or exclude records.
 
-Duplicate question-context records should be grouped where practical so closely related copies do not cross splits.
+Every exclusion must have a recorded reason.
 
-Near-duplicate detection is optional and must not delay the core project.
+If the source dataset has no stable ID, generate `source_id` as a deterministic SHA-256 hash of a canonical representation of the required original fields.
 
-### 5.4 Required leakage assertions
+Requirements:
 
-Automated checks must verify that:
+- Create IDs before splitting and expansion.
+- Preserve original row index separately.
+- Detect ID collisions.
+- Do not derive IDs from absolute paths.
+- Repeated runs over identical content must produce identical IDs.
 
-- No `source_id` occurs in more than one split.
-- Both expanded rows from every source record occur in the same split.
-- No known exact-duplicate group crosses splits.
-- Every valid source record produces exactly two expanded rows.
-- Every split is balanced.
-- Saved split manifests reproduce the same assignments when rerun.
+Tracked duplicate artifacts should use hashes and identifiers rather than reproducing complete raw contexts or answers.
 
 ---
 
-## 6. Dataset and Shortcut Audit
+## 9. Shortcut-Artifact Audit
 
-HaluEval’s correct and hallucinated answers come from different creation processes. A classifier may therefore learn answer style or length instead of grounding.
+HaluEval correct and hallucinated answers originate from different generation processes. The model may learn answer style instead of grounding.
 
-Before model training, report class-wise distributions for:
+The core dataset audit must compare classes using:
 
-- Answer token count
 - Answer character count
+- Answer token count
 - Answer sentence count
-- Numeric-token frequency
-- Answer-context cosine similarity
+- Numeric-token presence
+- Numeric-token count
 - Answer-context lexical coverage
-- Exact answer occurrence in the context
-- Missing or malformed values
+- Exact answer occurrence in context
+- Answer-context semantic similarity when embeddings become available
 
-At minimum, produce:
+The audit must include:
 
-- A summary statistics table by class
-- An answer-length distribution visualization
-- An answer-context similarity distribution visualization
-- A written interpretation of major class differences
+- Machine-readable results
+- Human-readable summary
+- Length-distribution visualization
+- Lexical or semantic coverage visualization
+- Conservative interpretation of observed differences
 
-These variables must be treated as possible confounders rather than automatically included in the primary model.
+Standalone answer length and style features must not be included in the primary semantic feature representation.
 
-Standalone answer-length and stylistic features must not be included in the primary feature vector.
+They are reserved for the negative-control classifier.
 
 ---
 
-## 7. Text and Embedding Pipeline
+## 10. Leakage-Safe Splitting
 
-### 7.1 Encoder
+### 10.1 Required order
+
+The mandatory order is:
+
+1. Load original records.
+2. Validate original records.
+3. Assign stable source IDs.
+4. Audit duplicates.
+5. Create duplicate-context groups.
+6. Split original grouped records.
+7. Save a tracked split manifest.
+8. Expand records within each split into paired labeled examples.
+
+Never split expanded rows independently.
+
+### 10.2 Split proportions
 
 Use:
 
-- Model: `sentence-transformers/all-MiniLM-L6-v2`
-- Embedding dimension: 384
-- Frozen encoder
+- 70% training
+- 15% validation
+- 15% test
+
+Use the split seed from the canonical configuration.
+
+Group-aware splitting may cause a small deviation from exact percentages. Record requested and achieved proportions.
+
+### 10.3 Grouping rule
+
+Records with identical normalized contexts must remain in the same split.
+
+Do not group records merely because they share common grounded answers, such as common names, dates, “yes,” or “no.”
+
+The split manifest must contain:
+
+- `source_id`
+- Original row index
+- Duplicate-context group ID
+- Assigned split
+
+Tracked manifests must not contain full questions, contexts, or answers.
+
+### 10.4 Required leakage assertions
+
+Verify:
+
+- No `source_id` crosses splits.
+- No duplicate-context group crosses splits.
+- Both paired examples from a source remain together.
+- Every valid source appears exactly once in the original-record manifest.
+- Every retained source generates exactly two examples.
+- Every expanded split is exactly class-balanced.
+- Labels retain their locked meanings.
+- Example IDs are unique and deterministic.
+- Repeated execution with the same inputs and seed reproduces the same manifest.
+
+Expanded text datasets belong under ignored processed-data paths. Lightweight split manifests and metadata must remain trackable.
+
+---
+
+## 11. Frozen Embedding Pipeline
+
+### 11.1 Encoder
+
+Use:
+
+- `sentence-transformers/all-MiniLM-L6-v2`
+- 384-dimensional embeddings
 - L2-normalized embeddings
+- Frozen encoder
 
-Record the installed package version and, when available, the model revision.
+Record package and model revision information where available.
 
-CPU execution must be supported. GPU execution may be used when available.
+CPU execution must be supported. GPU execution is optional.
 
-### 7.2 Text preprocessing
+### 11.2 Text preprocessing
 
-Preprocessing should remain minimal:
+Use minimal preprocessing:
 
-- Convert valid fields to strings.
-- Normalize repeated whitespace.
+- Convert validated fields to strings.
 - Strip leading and trailing whitespace.
-- Preserve meaningful case, punctuation, numbers, and negation.
-- Do not aggressively remove stopwords.
-- Do not stem or lemmatize text used by the sentence encoder.
+- Normalize repeated whitespace.
+- Preserve case where meaningful.
+- Preserve punctuation, numbers, and negation.
+- Do not stem or lemmatize encoder input.
+- Do not remove stopwords from encoder input.
 
-Any separate token normalization used for lexical coverage must not alter the original encoder input.
+Separate token normalization may be used for lexical coverage but must not alter encoder input.
 
-### 7.3 Context chunking
+### 11.3 Context chunking
 
-Long reference contexts must be chunked before embedding.
-
-Core configuration:
+Use tokenizer-aware chunks:
 
 - Maximum chunk size: 192 model tokens
-- Chunk overlap: 32 model tokens
-- Tokenizer-aware boundaries where practical
+- Overlap: 32 model tokens
 
 For each example:
 
-- Embed the question as `q`.
-- Embed the candidate answer as `a`.
-- Embed all context chunks as `c1, ..., cn`.
-- Select `ca`, the context chunk with the highest cosine similarity to the candidate answer.
+- `q` = question embedding
+- `a` = candidate-answer embedding
+- `c1 ... cn` = context-chunk embeddings
+- `c_a` = context chunk with maximum cosine similarity to the candidate answer
 
-Also calculate the maximum question-context similarity as a scalar feature.
+Also compute maximum question-context similarity as a scalar.
 
-Full question-context interaction vectors are optional and are not part of the core primary architecture.
+Full question-context interaction vectors are optional, not part of the primary architecture.
 
-### 7.4 Embedding caching
+### 11.4 Caching
 
-Cache embeddings to avoid repeated encoding.
+Cache embeddings and derived features.
 
-Cache metadata must include:
+Cache metadata must contain:
 
+- Dataset checksum
+- Split-manifest checksum
 - Encoder name
-- Encoder revision, if available
+- Encoder revision when available
 - Embedding dimension
 - Normalization setting
 - Chunk size
 - Chunk overlap
-- Dataset checksum
 - Preprocessing version
-- Feature-pipeline version
+- Feature schema version
 
-A cache must not be reused when incompatible metadata changes.
+Reject incompatible or stale caches clearly.
 
 ---
 
-## 8. Primary Feature Representation
+## 12. Primary Feature Representation
 
-The primary representation contains four 384-dimensional interaction blocks.
+The primary vector contains four 384-dimensional interaction blocks:
 
-Let:
-
-- `q` be the question embedding.
-- `a` be the candidate-answer embedding.
-- `ca` be the answer-selected context-chunk embedding.
-- `⊙` denote element-wise multiplication.
-
-Use the following vector features:
-
-1. `|a - ca|`
-2. `a ⊙ ca`
+1. `|a - c_a|`
+2. `a ⊙ c_a`
 3. `|q - a|`
 4. `q ⊙ a`
 
-These contribute:
+Vector dimension:
 
-`4 × 384 = 1,536 features`
+`4 × 384 = 1,536`
 
-### Core scalar features
-
-Add the following seven scalar features:
+Add seven scalar features:
 
 1. Maximum answer-context-chunk cosine similarity
 2. Mean of the top three answer-context-chunk similarities
 3. Question-answer cosine similarity
 4. Maximum question-context-chunk cosine similarity
-5. Answer content-token coverage in the context
-6. Answer numeric-token coverage in the context
-7. Indicator that the answer contains at least one numeric token
+5. Answer content-token coverage in context
+6. Answer numeric-token coverage in context
+7. Indicator that the answer contains a numeric token
 
 Total primary feature dimension:
 
-`1,536 + 7 = 1,543 features`
+`1,536 + 7 = 1,543`
 
-If a context has fewer than three chunks, average all available chunks for the top-three similarity feature.
+If fewer than three context chunks exist, average all available chunks for the top-three feature.
 
-For an answer without numeric tokens, use:
+For answers containing no numeric tokens:
 
-- Numeric coverage value: `0`
-- Numeric-presence indicator: `0`
+- Numeric coverage = `0`
+- Numeric-presence indicator = `0`
 
-### Feature scaling
+Do not add standalone raw answer embeddings, answer length, or style features to the primary representation without approval.
 
-Fit the feature scaler using training data only.
+Fit feature scaling using training data only.
 
-Apply the fitted training scaler unchanged to:
+Apply the fitted training scaler unchanged to validation, test, error-analysis, and demo inputs.
 
-- Validation data
-- Test data
-- Error-analysis examples
-- Demo input
-
-Logistic Regression and the MLP must use the same primary feature representation.
+Logistic Regression and the MLP must use the same primary representation.
 
 ---
 
-## 9. Models
+## 13. Models
 
-### 9.1 Cosine-similarity baseline
+### 13.1 Cosine baseline
 
-Use maximum answer-context-chunk cosine similarity as the baseline score.
+Use maximum answer-context-chunk cosine similarity.
 
 Expected direction:
 
@@ -380,195 +468,205 @@ Expected direction:
 
 Requirements:
 
-- Select the classification threshold using validation data only.
-- Optimize the threshold for hallucinated-class F1.
-- Use a continuous score with the direction reversed where necessary for hallucination ROC-AUC.
-- Do not select or adjust the threshold using test labels.
+- Select the threshold on validation data only.
+- Optimize hallucinated-class validation F1.
+- Use a correctly oriented continuous hallucination score for ROC-AUC.
+- Do not adjust the threshold using test labels.
 
-### 9.2 Logistic Regression baseline
+### 13.2 Logistic Regression
 
-Train Logistic Regression on the 1,543-dimensional primary feature vector.
+Train Logistic Regression using the 1,543-dimensional primary feature representation.
 
-Core configuration:
+Use:
 
 - L2 regularization
-- Sufficient maximum iterations for convergence
+- No class weights unless an unexpected imbalance is documented
+- Sufficient iterations for convergence
 - Fixed random state where applicable
-- No class weights unless an unexpected imbalance is discovered and documented
 
-Use the following small validation-only search:
+Validation-only regularization search:
 
-- `C = 0.01`
-- `C = 0.1`
-- `C = 1`
-- `C = 10`
+- `C ∈ {0.01, 0.1, 1, 10}`
 
-Select the configuration using validation F1 for the hallucinated class.
+Select using hallucinated-class validation F1.
 
-### 9.3 Neural MLP
+### 13.3 Style/length-only negative control
 
-Use the following lightweight PyTorch architecture:
+Train a separate lightweight Logistic Regression diagnostic using answer-only surface features.
 
-- Input: 1,543 features
-- Linear layer: 1,543 -> 256
+Recommended features:
+
+- Character count
+- Token count
+- Sentence count
+- Numeric-token presence
+- Numeric-token count
+- Punctuation count or rate
+
+The negative control must not receive:
+
+- Question text or embeddings
+- Context text or embeddings
+- Answer-context coverage
+- Answer-context similarity
+- Primary semantic interaction features
+
+Purpose:
+
+- Measure how much label information can be recovered from answer-generation style alone.
+- Diagnose shortcut learning.
+- Inform limitations.
+
+It is not one of the three primary models and must be labeled as a negative control.
+
+### 13.4 Neural MLP
+
+Locked architecture:
+
+- Input: 1,543
+- Linear: 1,543 -> 256
 - ReLU
 - Dropout: 0.20
-- Linear layer: 256 -> 64
+- Linear: 256 -> 64
 - ReLU
 - Dropout: 0.10
-- Linear layer: 64 -> 1
+- Linear: 64 -> 1
 
-Training configuration:
+Training:
 
 - Loss: `BCEWithLogitsLoss`
 - Optimizer: AdamW
-- Initial learning rate: `1e-3`
+- Learning rate: `1e-3`
 - Weight decay: `1e-4`
 - Batch size: 128
 - Maximum epochs: 30
 - Early-stopping patience: 5
 - Early-stopping criterion: validation loss
 - Best checkpoint: lowest validation loss
-- Classification threshold: selected on validation data for hallucinated-class F1
+- Classification threshold: validation-selected for hallucinated-class F1
 
-Do not add architectural complexity unless the locked model fails to train correctly.
+Do not make the architecture more complex unless the locked model is technically defective and the change-control procedure is followed.
 
-### 9.4 Random seeds
+### 13.5 Seeds
 
-Train the MLP using three documented random seeds.
+Train the MLP using three documented seeds.
 
-Report:
+Report mean and standard deviation across the three runs.
 
-- Mean test metrics across the three runs
-- Standard deviation across the three runs
-
-For outputs requiring one representative model, including a confusion matrix and qualitative error analysis, select the run using validation performance only.
-
-Prefer the run with median validation F1.
+For single-run visualizations and error analysis, select the representative run using validation performance only. Prefer the median validation-F1 run.
 
 Never select the representative run using test performance.
 
-If runtime is genuinely negligible, more seeds may be added as an optional extension.
-
 ---
 
-## 10. Training Protocol
-
-The training pipeline must:
-
-- Set Python, NumPy, and PyTorch seeds.
-- Record package and platform information.
-- Load previously saved split manifests.
-- Fit preprocessing components on training data only.
-- Save the model configuration.
-- Save the fitted feature scaler.
-- Save model checkpoints.
-- Save epoch-level training and validation losses.
-- Record the selected validation threshold.
-- Avoid inspecting test metrics during model development.
-
-The project should use a small, predefined configuration rather than a large hyperparameter search.
-
-The pretrained sentence encoder must remain frozen throughout the project.
-
----
-
-## 11. Evaluation Protocol
-
-### 11.1 Primary metric
-
-The primary metric is:
-
-- F1 score for the hallucinated class
-
-### 11.2 Required secondary metrics
-
-Report:
-
-- Accuracy
-- Precision for the hallucinated class
-- Recall for the hallucinated class
-- F1 for the hallucinated class
-- ROC-AUC
-- Confusion matrix
-
-Use continuous model scores, not hard predictions, to calculate ROC-AUC.
-
-### 11.3 Required visualizations
-
-Produce:
-
-- Model-comparison results table
-- Confusion matrix for each primary approach
-- ROC curve comparing all three approaches
-- Precision-recall curve comparing all three approaches
-- MLP training and validation loss curve
-
-If time becomes constrained, prioritize:
-
-1. Results table
-2. Confusion matrices
-3. ROC curve
-4. Precision-recall curve
-5. Training-history plot
-
-### 11.4 Test-set policy
+## 14. Test-Set Protection
 
 The test set is locked during development.
 
 Use validation data for:
 
 - Cosine threshold selection
-- Logistic Regression regularization selection
+- Logistic Regression regularization
 - MLP early stopping
+- Checkpoint selection
 - MLP threshold selection
-- Representative MLP seed selection
-- Any optional architecture decisions
+- Representative seed selection
+- Optional architecture decisions
 
-Run final test evaluation only after the feature pipeline and model-selection rules are fixed.
+Do not use test data to decide:
 
-If a genuine implementation defect is found after test evaluation, document the defect and the reason for rerunning evaluation rather than silently replacing the result.
+- Which features to retain
+- Which model configuration to use
+- Whether an optional extension is beneficial
+- Which seed to report
+- Which threshold to use
 
-### 11.5 Comparison table
+If a real implementation defect is found after test evaluation, record:
 
-The README must contain a table with at least:
+- The defect
+- Its effect
+- The correction
+- Why reevaluation was necessary
 
-| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
-|---|---:|---:|---:|---:|---:|
-| Cosine threshold | TBD | TBD | TBD | TBD | TBD |
-| Logistic Regression | TBD | TBD | TBD | TBD | TBD |
-| Neural MLP | TBD | TBD | TBD | TBD | TBD |
-
-For the MLP, report mean plus or minus standard deviation across three seeds where appropriate.
-
-### 11.6 Outcome-neutral reporting
-
-The final report must not imply that the MLP is superior unless the measured results support that conclusion.
-
-The discussion should distinguish between:
-
-- Numerical improvement
-- Consistency across seeds
-- Practical significance
-- Possible benchmark shortcuts
-- Generalization limitations
+Do not silently replace results.
 
 ---
 
-## 12. Qualitative Error Analysis
+## 15. Evaluation Protocol
 
-Analyze high-confidence MLP errors after final evaluation.
+### 15.1 Primary metric
 
-Review at least:
+Primary metric:
+
+- F1 for the hallucinated class
+
+### 15.2 Required metrics
+
+Report for the three primary approaches:
+
+- Accuracy
+- Precision for Hallucinated
+- Recall for Hallucinated
+- F1 for Hallucinated
+- ROC-AUC
+- Confusion matrix
+
+Use continuous scores for ROC-AUC.
+
+### 15.3 Required outputs
+
+Produce:
+
+- Model-comparison table
+- Confusion matrices
+- ROC curve
+- Precision-recall curve
+- MLP training/validation loss curve
+- Machine-readable predictions
+- Machine-readable metrics
+- Recorded thresholds
+- MLP seed summary
+
+For the MLP, report mean and standard deviation across three seeds where appropriate.
+
+### 15.4 Shuffled-context sanity test
+
+After primary evaluation is locked, run a deterministic shuffled-context test.
+
+Requirements:
+
+- Shuffle contexts among test source records.
+- Ensure a record does not retain its own context.
+- Give both paired candidate answers from a source the same shuffled context.
+- Do not retrain models.
+- Recompute context-dependent features.
+- Apply the existing training-fitted scaler, models, and validation-selected thresholds unchanged.
+- Report performance changes for the cosine baseline, Logistic Regression, and representative MLP.
+- Do not use the sanity-test results for model selection.
+
+Interpretation:
+
+- A context-grounding detector should normally deteriorate when contexts are unrelated.
+- A small performance change may indicate reliance on answer style or other shortcuts.
+- The outcome must be reported honestly; no predetermined drop is required.
+
+---
+
+## 16. Qualitative Error Analysis
+
+Review high-confidence errors from the representative MLP.
+
+Minimum:
 
 - 10 high-confidence false positives
 - 10 high-confidence false negatives
 
-A false positive means a grounded answer predicted as hallucinated.
+Definitions:
 
-A false negative means a hallucinated answer predicted as grounded.
+- False positive: grounded answer predicted hallucinated
+- False negative: hallucinated answer predicted grounded
 
-For every reviewed example, record:
+Record:
 
 - `source_id`
 - Question
@@ -577,11 +675,11 @@ For every reviewed example, record:
 - True label
 - Predicted label
 - Hallucination score
-- Confidence or distance from the classification threshold
-- Assigned failure category
-- Short analyst note
+- Distance from threshold
+- Failure category
+- Analyst note
 
-Use the following initial categories:
+Initial categories:
 
 - Entity substitution
 - Numerical hallucination
@@ -590,506 +688,316 @@ Use the following initial categories:
 - Plausible but unsupported information
 - Partial correctness
 - Context ambiguity
-- Evidence missed because of context selection
+- Evidence missed through context selection
 - Dataset or label anomaly
 - Other or unclear
 
 Categories may be multi-label.
 
-The error analysis is descriptive. Do not present category frequencies from this small selected sample as population-level estimates.
+The analysis is descriptive and must not be presented as a population-level statistical estimate.
 
 ---
 
-## 13. Reproducibility Requirements
+## 17. Reproducibility
 
-The completed repository must allow another user to reproduce:
+The repository must support reproduction of:
 
 1. Dataset acquisition
-2. Dataset validation
-3. Leakage-safe splitting
-4. Paired expansion
-5. Embedding generation
-6. Feature extraction
-7. Baseline training
-8. MLP training
-9. Final evaluation
-10. Result figures and tables
+2. Validation and provenance
+3. Artifact audit
+4. Leakage-safe splitting
+5. Paired expansion
+6. Context chunking
+7. Embedding generation
+8. Feature generation
+9. Baseline training
+10. MLP training
+11. Final evaluation
+12. Shuffled-context testing
+13. Error-analysis artifact generation
+14. Figures and tables
 
-Required reproducibility artifacts:
+Preserve:
 
-- Dependency specification
-- Fixed configuration file
-- Random seeds
-- Split manifest
+- Canonical configuration
 - Dataset checksum
-- Cached-feature metadata
-- Model configuration
-- Saved thresholds
-- Saved evaluation results
-- Clear execution instructions
+- Source revision
+- Split manifest
+- Split-manifest checksum
+- Seeds
+- Cache metadata
+- Feature schema
+- Fitted scaler
+- Model configurations
+- Validation-selected thresholds
+- Machine-readable results
 
-Generated artifacts must be separated from source code.
+Do not commit:
 
-Large caches and model checkpoints may be excluded from Git if reproducible generation instructions are provided.
+- Raw downloaded data
+- Processed text datasets
+- Embedding caches
+- Virtual environments
+- Secrets
+- Temporary files
+- Large model checkpoints unless explicitly required
 
----
-
-## 14. Recommended Repository Structure
-
-    neural-hallucination-detector/
-    ├── app/
-    ├── configs/
-    │   └── default.yaml
-    ├── data/
-    │   ├── raw/
-    │   ├── processed/
-    │   └── splits/
-    ├── notebooks/
-    │   └── 01_data_audit.ipynb
-    ├── results/
-    │   ├── figures/
-    │   ├── metrics/
-    │   └── error_analysis/
-    ├── scripts/
-    ├── src/
-    │   └── hallucination_detector/
-    │       ├── data/
-    │       ├── features/
-    │       ├── models/
-    │       ├── training/
-    │       └── evaluation/
-    ├── tests/
-    ├── AGENTS.md
-    ├── PROJECT_PLAN.md
-    ├── README.md
-    ├── requirements.txt
-    └── .gitignore
-
-The exact number of modules should remain modest.
-
-Avoid unnecessary abstraction layers or files containing only a few lines.
-
-A single exploratory notebook is sufficient. The reproducible pipeline must live outside the notebook.
+Track lightweight provenance, manifests, metrics, figures, and error-analysis summaries when appropriate.
 
 ---
 
-## 15. Project Phases and Acceptance Criteria
+## 18. Project Phases
 
-### Phase 0 — Protocol and repository setup
+### Phase 0 — Research protocol and repository setup
 
-Tasks:
+Required outputs:
 
-- Create the repository structure.
-- Record the research question and hypotheses.
-- Create the default experiment configuration.
-- Define seeds, labels, metrics, and split proportions.
-- Create `AGENTS.md`.
-- Establish dependency and artifact-management rules.
+- Repository structure
+- `PROJECT_PLAN.md`
+- `AGENTS.md`
+- Canonical configuration
+- Dependency specification
+- Packaging metadata
+- `.gitignore`
+- README skeleton
+- Basic test infrastructure
 
 Acceptance criteria:
 
-- The project installs in a fresh environment.
-- The experiment configuration has one source of truth.
-- `Hallucinated = 1` is documented.
+- Package can be installed or imported as documented.
+- Configuration is the single source of truth.
+- Locked methodology is represented correctly.
 - Test-set restrictions are documented.
-- `AGENTS.md` instructs coding agents to follow this plan.
-- No model implementation begins before the protocol is fixed.
+- No later-phase implementation is introduced.
 
-### Phase 1 — Dataset acquisition and audit
+### Phase 1 — HaluEval acquisition and artifact audit
 
-Tasks:
+Required outputs:
 
-- Acquire HaluEval QA reproducibly.
-- Validate the schema.
-- Assign stable source IDs.
-- Identify invalid and duplicate records.
-- Produce the shortcut-risk audit.
-
-Acceptance criteria:
-
-- Dataset source and checksum are recorded.
-- Raw, valid, excluded, and duplicate counts are reported.
-- Exclusions have explicit reasons.
-- Answer-length and semantic-overlap distributions are compared by class.
-- Potential confounders are discussed before training.
-
-### Phase 2 — Leakage-safe splitting and expansion
-
-Tasks:
-
-- Group exact duplicates where necessary.
-- Split original records 70/15/15.
-- Save the split manifest.
-- Expand records into paired labeled rows.
-- Add automated leakage tests.
+- Official revision-pinned acquisition
+- Provenance metadata
+- Checksum
+- Validation report
+- Stable source-ID manifest
+- Duplicate audit
+- Text-level shortcut audit
+- Audit figures and summary
+- Synthetic network-free tests
 
 Acceptance criteria:
 
+- Official source and revision are recorded.
+- All record exclusions are explained.
+- Source IDs are deterministic.
+- Duplicate counts are exact and internally consistent.
+- Tracked audit artifacts do not reproduce the full raw dataset.
+- Shortcut risks are documented.
+- Tests pass.
+
+### Phase 2 — Leakage-safe split and paired dataset
+
+Required outputs:
+
+- Duplicate-context grouping
+- Original-record split manifest
+- Split metadata and checksum
+- Paired expanded train, validation, and test data
+- Leakage-validation command
+- Synthetic tests
+
+Acceptance criteria:
+
+- Split occurs before expansion.
 - No source ID crosses splits.
-- No known exact-duplicate group crosses splits.
-- Both answers from a source record remain together.
-- Every retained source produces exactly two rows.
-- Every split is balanced.
-- Repeated execution with the same seed reproduces the split.
+- No duplicate-context group crosses splits.
+- Both paired answers remain together.
+- Expanded splits are balanced.
+- Manifest generation is deterministic.
+- Tracked manifests contain no full dataset text.
+- Tests pass.
 
-### Phase 3 — Embedding and feature pipeline
+### Phase 3 — Context chunks, embeddings, and features
 
-Tasks:
+Required outputs:
 
-- Implement minimal text normalization.
-- Add tokenizer-aware context chunking.
-- Produce frozen question, answer, and chunk embeddings.
-- Select the answer-relevant context chunk.
-- Construct the 1,543-dimensional primary feature vector.
-- Cache embeddings and feature metadata.
-- Fit scaling using training data only.
-
-Acceptance criteria:
-
-- Feature dimensions are validated automatically.
-- Long contexts generate multiple chunks.
-- Empty and short contexts are handled safely.
-- Cache compatibility is checked before reuse.
-- Validation and test data do not influence fitted preprocessing.
-- Repeated feature generation is deterministic.
-
-### Phase 4 — Baselines
-
-Tasks:
-
-- Train and validate the cosine-threshold baseline.
-- Train and validate Logistic Regression.
-- Save validation decisions and configurations.
-- Generate preliminary validation metrics.
+- Frozen encoder wrapper
+- Token-aware context chunking
+- Embedding cache
+- Answer-relevant chunk selection
+- Seven scalar features
+- 1,543-dimensional feature matrices
+- Training-only scaler
+- Cache validation
+- Synthetic tests
 
 Acceptance criteria:
 
-- The cosine threshold is selected using validation data only.
-- Logistic Regression uses the shared primary features.
-- Regularization selection uses validation data only.
+- Encoder remains frozen.
+- Feature dimensions equal 1,543.
+- Scaling is fitted using training data only.
+- Validation and test transformations reuse the training scaler.
+- Cache metadata prevents incompatible reuse.
+- No test-set model selection occurs.
+- Tests pass.
+
+### Phase 4 — Baselines and negative control
+
+Required outputs:
+
+- Cosine threshold baseline
+- Logistic Regression baseline
+- Style/length-only negative control
+- Validation-only tuning
+- Saved thresholds, models, and metrics
+- Tests
+
+Acceptance criteria:
+
+- Primary Logistic Regression uses the shared 1,543 features.
+- Negative control uses answer-only surface features.
+- Validation data selects thresholds and regularization.
 - ROC-AUC uses continuous scores.
-- Saved predictions can be traced to source IDs.
+- Test data does not guide decisions.
+- Tests pass.
 
-### Phase 5 — MLP training
+### Phase 5 — PyTorch MLP
 
-Tasks:
+Required outputs:
 
-- Implement the locked MLP architecture.
-- Add deterministic seeding.
-- Add early stopping and checkpointing.
-- Train three seeds.
-- Save training histories and validation thresholds.
-
-Acceptance criteria:
-
-- The sentence encoder remains frozen.
-- The input dimension matches the feature contract.
-- Best checkpoints are selected using validation loss.
-- Classification thresholds are selected using validation data.
-- Training does not rely on test metrics.
-- All three seeds produce complete and traceable run artifacts.
-
-### Phase 6 — Final evaluation and comparison
-
-Tasks:
-
-- Run final test evaluation.
-- Calculate all required metrics.
-- Aggregate the MLP seed results.
-- Generate comparison plots and confusion matrices.
-- Create machine-readable and README-ready result tables.
+- Locked MLP architecture
+- Reproducible training loop
+- Early stopping
+- Checkpoints
+- Three seeded runs
+- Training histories
+- Validation-selected thresholds
+- Tests
 
 Acceptance criteria:
 
-- Every model is evaluated on the identical test set.
-- Positive-class definitions are consistent.
-- All required metrics are reported.
-- MLP variability across seeds is reported.
-- Representative plots use a validation-selected seed.
-- Conclusions match the evidence, including a possible negative result.
+- Encoder remains frozen.
+- Model input is 1,543.
+- Validation loss controls early stopping.
+- No test-set decisions occur.
+- Three complete seeded runs exist.
+- Tests pass.
+
+### Phase 6 — Final evaluation and robustness
+
+Required outputs:
+
+- Locked test evaluation
+- Required metrics and plots
+- Comparison table
+- MLP mean and standard deviation
+- Representative validation-selected MLP run
+- Shuffled-context sanity test
+- Machine-readable predictions and results
+
+Acceptance criteria:
+
+- All primary models use the identical test examples.
+- Metric direction and positive class are correct.
+- Continuous scores are used for ROC-AUC.
+- Shuffled-context evaluation does not retrain or retune models.
+- Results are reported honestly.
+- Tests pass.
 
 ### Phase 7 — Qualitative error analysis
 
-Tasks:
-
-- Identify high-confidence false positives and false negatives.
-- Review at least 20 total errors.
-- Assign predefined failure categories.
-- Summarize recurring limitations.
-
-Acceptance criteria:
-
-- At least 10 false positives and 10 false negatives are reviewed when available.
-- Every analysis row contains evidence and a written rationale.
-- Label anomalies are distinguished from model errors.
-- Findings are described as qualitative and descriptive.
-- The README contains representative examples or a concise findings summary.
-
-### Phase 8 — Documentation and reproducibility
-
-Tasks:
-
-- Complete the README.
-- Add dataset and model citations.
-- Document commands and expected outputs.
-- Verify the pipeline from a clean environment.
-- Remove temporary and generated files from version control.
-- Add the optional demo only if time remains.
-
-Acceptance criteria:
-
-- A new user can understand the research question and reproduce the experiment.
-- The README includes the three-model comparison table.
-- Key plots are visible in the README.
-- Limitations and benchmark-specific claims are explicit.
-- Configuration, seeds, and artifact locations are documented.
-- Core work is complete before optional features are attempted.
-
----
-
-## 16. Optional Extensions
-
-The following are optional and must not delay the core project.
-
-### Extended question-context features
-
-Add:
-
-- `|q - cq|`
-- `q ⊙ cq`
-
-Here, `cq` is the context chunk most similar to the question.
-
-Treat this as a documented feature ablation rather than silently changing the primary feature specification.
-
-### Cluster-bootstrap confidence intervals
-
-Calculate confidence intervals by resampling original source records while keeping paired rows together.
-
-### Additional MLP seeds
-
-Increase from three seeds to five only if runtime is negligible.
-
-### Shortcut negative-control classifier
-
-Train a small diagnostic classifier using only answer-level length and style features.
-
-Use it to estimate how much label information is available without the reference context.
-
-### Shuffled-context stress test
-
-Replace each test context with an unrelated context and measure how much model performance changes.
-
-### Feature ablations
-
-Possible ablations include:
-
-- Scalar features only
-- Embedding-interaction features only
-- Removing question-answer interactions
-- Removing lexical coverage
-- Adding question-context interaction blocks
-
-### Calibration analysis
-
-Possible additions include:
-
-- Reliability diagram
-- Brier score
-- Expected calibration error
-- Validation-fitted temperature scaling
-
-Do not describe sigmoid output as calibrated unless calibration is explicitly performed and evaluated.
-
-### Paired metrics
-
-Possible additions include:
-
-- Pairwise ranking accuracy
-- Pair consistency accuracy
-
-### Minimal demo
-
-Use Streamlit or Gradio with:
-
-Inputs:
-
-- Question
-- Reference context
-- Candidate answer
-
-Outputs:
-
-- Grounded or Hallucinated
-- Model score
-
-The demo must reuse the exact saved:
-
-- Encoder
-- Text preprocessing
-- Context chunking configuration
-- Feature implementation
-- Scaler
-- MLP checkpoint
-- Classification threshold
-
-The interface must state that its output is an experimental, benchmark-trained prediction and not a factual guarantee.
-
----
-
-## 17. Six-Day Schedule
-
-### Day 1 — Protocol, setup, and dataset integrity
-
-Complete:
-
-- Phase 0
-- Phase 1
-- Phase 2
-
-End-of-day target:
-
-- Validated dataset
-- Saved leakage-safe split manifest
-- Paired expanded splits
-- Dataset audit
-- Passing leakage tests
-
-### Day 2 — Embeddings and features
-
-Complete:
-
-- Phase 3
-
-End-of-day target:
-
-- Working frozen embedding pipeline
-- Context chunking
-- Cached embeddings
-- Validated 1,543-dimensional features
-- Training-only scaler
-
-### Day 3 — Baselines and initial MLP
-
-Complete:
-
-- Phase 4
-- Initial Phase 5 training
-
-End-of-day target:
-
-- Validated cosine baseline
-- Validated Logistic Regression baseline
-- First complete MLP run
-- Saved training artifacts
-
-### Day 4 — Repeated training and locked evaluation
-
-Complete:
-
-- Remaining Phase 5
-- Phase 6
-
-End-of-day target:
-
-- Three MLP seed runs
-- Final test metrics
-- Comparison table
-- Confusion matrices
-- ROC curve
-- Precision-recall curve
-
-### Day 5 — Error analysis and research narrative
-
-Complete:
-
-- Phase 7
-- Most of Phase 8
-
-End-of-day target:
-
-- Categorized error-analysis table
+Required outputs:
+
+- High-confidence false-positive table
+- High-confidence false-negative table
+- At least 20 reviewed errors when available
+- Failure categories
 - Written findings
-- README methodology
-- README results and limitations
+
+Acceptance criteria:
+
+- At least 10 errors of each required type are reviewed when available.
+- Evidence and rationale are preserved.
+- Dataset anomalies are distinguished from model failures.
+- Findings are clearly descriptive.
+
+### Phase 8 — README, reproducibility, and optional demo
+
+Required outputs:
+
+- Complete README
+- Results table
+- Key figures
+- Reproduction commands
+- Limitations
 - Citations
-- Reproduction instructions
+- Clean-environment verification
 
-### Day 6 — Verification, polish, and optional work
+Optional output:
 
-Priority order:
+- Minimal Streamlit or Gradio demo
 
-1. Clean-environment reproducibility check
-2. Fix tests and documentation
-3. Validate figures and saved artifacts
-4. Improve README presentation
-5. Attempt one high-value optional extension
-6. Add a minimal demo only if all core work is complete
+Acceptance criteria:
 
-The demo is the first major component to remove if the schedule slips.
+- A new user can reproduce the core experiment.
+- README distinguishes primary models and negative control.
+- Shortcut and shuffled-context results are discussed.
+- Claims remain benchmark-specific.
+- No fabricated values or unsupported claims appear.
+- Demo is attempted only after the core project is complete.
 
 ---
 
-## 18. Definition of Done
+## 19. Six-Day Scope
+
+Original target schedule:
+
+- Day 1: Phases 0–2
+- Day 2: Phase 3
+- Day 3: Phases 4–5
+- Day 4: Phase 6
+- Day 5: Phase 7 and README
+- Day 6: Reproducibility, polish, and optional demo
+
+When resuming an existing repository, do not restart this schedule. Determine completed phases and allocate remaining time only to incomplete phases.
+
+If time becomes constrained, cut work in this order:
+
+1. Demo
+2. Calibration
+3. Additional ablations
+4. Confidence intervals
+5. Extra seeds beyond three
+6. Extended question-context vectors
+
+Never cut:
+
+- Leakage protection
+- Three primary model comparison
+- Negative control
+- Shuffled-context sanity test
+- Final evaluation
+- Error analysis
+- Reproducibility documentation
+
+---
+
+## 20. Definition of Done
 
 The core project is complete when:
 
-- HaluEval QA is acquired and documented reproducibly.
+- Official HaluEval QA provenance is documented.
+- Data validation and shortcut auditing are reproducible.
 - Original records are split before paired expansion.
 - Leakage assertions pass.
-- Dataset shortcut risks are audited.
-- Frozen MiniLM embeddings and chunked contexts are used.
-- The primary feature vector follows the locked 1,543-feature specification.
-- Cosine similarity, Logistic Regression, and MLP are evaluated fairly.
-- Three MLP-seed runs are completed.
-- All required test metrics and confusion matrices are available.
-- At least 20 high-confidence errors are qualitatively analyzed.
-- The README contains results, methodology, limitations, citations, and reproduction instructions.
-- Conclusions remain faithful to the observed evidence.
+- Frozen chunked MiniLM embeddings are used.
+- Primary features match the locked 1,543-dimensional schema.
+- Cosine, Logistic Regression, and MLP are compared fairly.
+- The style/length negative control is reported separately.
+- Three MLP seeds are evaluated.
+- Required metrics and plots are complete.
+- The shuffled-context sanity test is complete.
+- At least 20 high-confidence errors are reviewed when available.
+- README contains methodology, results, limitations, citations, and reproduction steps.
+- Conclusions remain faithful to the evidence.
 
-The project is not considered unsuccessful if the MLP fails to outperform Logistic Regression.
-
-Experimental validity, transparent analysis, focused scope, and reproducibility take priority over obtaining a preferred result.
-
----
-
-## 19. Instructions for GitHub Copilot Agent
-
-The companion `AGENTS.md` must treat this document as the methodological source of truth.
-
-GitHub Copilot Agent must:
-
-- Read `PROJECT_PLAN.md` completely before making changes.
-- Work on only the phase named in the current prompt.
-- Stop after completing the requested phase.
-- Never automatically begin the next phase.
-- Preserve the locked label convention.
-- Preserve the split-before-expansion requirement.
-- Never fit transformations using validation or test data.
-- Never use test results for feature, model, checkpoint, threshold, or seed selection.
-- Never silently change the encoder, context chunking, feature contract, MLP architecture, primary metric, or evaluation protocol.
-- Keep optional extensions separate from the core requirements.
-- Add or update tests for every phase.
-- Keep the implementation small and appropriate for a six-day project.
-- Avoid unnecessary abstractions, services, dependencies, or infrastructure.
-- Report all assumptions and unresolved issues.
-
-At the end of every phase, Copilot Agent must report:
-
-1. Files created or changed
-2. Important implementation decisions
-3. Commands and tests run
-4. Test outcomes
-5. Acceptance criteria satisfied
-6. Assumptions
-7. Unresolved issues
-8. Recommended next phase
-
-If Copilot believes a locked methodological choice is defective or technically impossible, it must stop and report:
-
-1. The affected requirement
-2. Evidence of the problem
-3. The smallest proposed change
-4. The methodological consequences
-
-Copilot must wait for approval before applying such a change.
+A result in which the MLP does not win still satisfies the project objective.
