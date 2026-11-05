@@ -87,9 +87,13 @@ Phase 3 commands (frozen embeddings & features)
   - python scripts/run_phase3.py
 - Explicitly replace incompatible or stale embedding caches:
   - python scripts/run_phase3.py --force-recompute
+- Generate the descriptive semantic-similarity audit from training data only:
+  - python scripts/audit_train_similarity.py
 
 Phase 3 methodology
 -------------------
+- Normalize each question, candidate answer, and reference context with `" ".join(text.split())`: require a string, strip outer whitespace, and collapse consecutive Unicode whitespace to one ordinary space. Apply this before deduplication, encoding, chunking, and scalar coverage calculation. Raw/processed source files, source/example IDs, splits, and labels are preserved.
+- Preprocessing cache version: `2.0.0`; caches from the previous preprocessing version are rejected and require explicit regeneration with `--force-recompute`.
 - Encoder: sentence-transformers/all-MiniLM-L6-v2 (frozen, 384-d, L2-normalized)
 - Context chunking: 192 model tokens per chunk, 32-token overlap, tokenizer-aware
 - Primary feature vector (dim=1,543):
@@ -136,6 +140,14 @@ Preliminary text-level audit (no embeddings) shows noticeable differences betwee
 - Hallucinated answers are longer on average (token mean ≈ 10.99, median 9) and have lower lexical overlap with the context (mean lexical coverage ≈ 0.628).
 
 These observations suggest potential shortcut risks based on answer length and lexical overlap. Phase 3 now supplies the frozen-embedding similarity features used by the primary models.
+
+Train-only semantic-similarity audit (Phase 3)
+---------------------------------------------
+`python scripts/audit_train_similarity.py` compares the unscaled maximum answer-context-chunk cosine by label using only `data/features/train/features.npy` and training labels. It writes aggregate counts, means, population standard deviations, quartiles, and ranges to `results/metrics/halueval_train_semantic_audit.json` and a comparison histogram to `results/figures/train_answer_context_cosine.png`.
+
+After normalized regeneration, each training class contains 7,000 examples. Grounded answers have mean cosine 0.3611 (median 0.3731; population SD 0.2111), while hallucinated answers have mean 0.5628 (median 0.5838; population SD 0.1882). Hallucinated answers therefore have higher similarity on average in this training split, contrary to the cosine baseline's expected direction. The distributions overlap substantially; the earlier answer-length differences are a possible contributing benchmark artifact, not an established explanation. The prescribed cosine direction and feature design remain unchanged.
+
+This descriptive audit does not calculate test performance or change the locked feature design. Differences may reflect grounding and benchmark shortcuts; they do not establish causality or generalization.
 
 Repository structure
 --------------------

@@ -1,0 +1,35 @@
+{
+  "split": "train",
+  "feature": "max_answer_context_cosine",
+  "scaled": false,
+  "preprocessing_version": "2.0.0",
+  "training_features_sha256": "a726bb99c4050ce01d2fcd6e9444e255a7c3e03bade66d54dcd6461e1c7b2250",
+  "training_labels_sha256": "a1988f50c327517203065db3f97dcedac0f0162a57446ab5ac9eb43f0367ed42",
+  "dataset_checksum": "89ed139ec5e3a3169a0b30e45569ac1283846f76f27f7bb5e908ee6deed57e88",
+  "split_manifest_checksum": "cec404672fb3a9994a6f6413793a774fbdb46de718b5294ebdc4158b9c13ce6b",
+  "statistics": {
+    "grounded": {
+      "label": 0,
+      "count": 7000,
+      "mean": 0.36109381914138794,
+      "std_population": 0.21105046570301056,
+      "min": -0.09104549884796143,
+      "q25": 0.17968207597732544,
+      "median": 0.37305325269699097,
+      "q75": 0.5321518778800964,
+      "max": 0.974987268447876
+    },
+    "hallucinated": {
+      "label": 1,
+      "count": 7000,
+      "mean": 0.5628075003623962,
+      "std_population": 0.18819360435009003,
+      "min": -0.0691206306219101,
+      "q25": 0.4380926191806793,
+      "median": 0.5838406085968018,
+      "q75": 0.7060823440551758,
+      "max": 0.9880526661872864
+    }
+  },
+  "interpretation": "Descriptive training-only comparison. Separation and overlap may reflect grounding and benchmark shortcuts; these statistics do not establish generalization or causality and do not change the locked feature design."
+}

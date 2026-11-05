@@ -7,6 +7,7 @@ tokenizer so that chunk boundaries respect real token limits.
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Protocol
+from hallucination_detector.features.preprocessing import normalize_text
 
 
 class SupportsTokenize(Protocol):
@@ -56,7 +57,8 @@ def chunk_context(
     Raises:
         ValueError: If context is empty/whitespace, or overlap >= max.
     """
-    if not context or not context.strip():
+    context = normalize_text(context)
+    if not context:
         raise ValueError("context must be a non-empty string")
 
     if overlap_tokens >= max_chunk_tokens:

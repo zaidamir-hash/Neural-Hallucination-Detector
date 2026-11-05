@@ -16,10 +16,10 @@ from typing import Any, Dict, List, Optional, Tuple
 import numpy as np
 
 from hallucination_detector.features.encoder import FrozenEncoder
+from hallucination_detector.features.preprocessing import PREPROCESSING_VERSION
 
 logger = logging.getLogger(__name__)
 
-PREPROCESSING_VERSION = "1.0.0"
 CACHE_FORMAT_VERSION = "1.0.0"
 
 

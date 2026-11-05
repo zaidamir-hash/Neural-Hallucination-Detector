@@ -11,6 +11,7 @@ from typing import List, Optional
 
 import numpy as np
 import torch
+from hallucination_detector.features.preprocessing import normalize_text
 
 logger = logging.getLogger(__name__)
 
@@ -122,6 +123,7 @@ class FrozenEncoder:
             if not isinstance(t, str):
                 raise TypeError(f"texts[{i}] is {type(t).__name__}, expected str")
 
+        texts = [normalize_text(text) for text in texts]
         bs = batch_size or self._batch_size
 
         with torch.no_grad():

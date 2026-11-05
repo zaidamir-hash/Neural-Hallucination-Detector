@@ -1,19 +1,19 @@
 """Seven scalar features for the primary representation.
 
 Computes the lexical and numeric coverage features from raw text.
-These are computed from the original un-normalized text (for encoder input
-preservation) but use a separate lightweight token normalization for
-lexical matching.
+Inputs use the same whitespace normalization as the encoder, followed by
+separate lightweight token normalization for lexical matching.
 """
 from __future__ import annotations
 
 import re
 from typing import List, Set
+from hallucination_detector.features.preprocessing import normalize_text
 
 
 def _content_tokens(text: str) -> List[str]:
     """Lowercased punctuation-stripped tokens for lexical matching."""
-    toks = re.split(r"\s+", text.strip())
+    toks = normalize_text(text).split()
     cleaned = [re.sub(r"(^\W+|\W+$)", "", t).lower() for t in toks]
     return [t for t in cleaned if t]
 
@@ -24,7 +24,7 @@ def _content_token_set(text: str) -> Set[str]:
 
 def _numeric_tokens(text: str) -> List[str]:
     """Tokens containing at least one digit."""
-    toks = re.split(r"\s+", text.strip())
+    toks = normalize_text(text).split()
     return [t for t in toks if re.search(r"\d", t)]
 
 

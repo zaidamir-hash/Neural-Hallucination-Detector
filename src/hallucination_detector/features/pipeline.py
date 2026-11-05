@@ -33,6 +33,7 @@ from hallucination_detector.features.embeddings import (
     CACHE_FORMAT_VERSION,
 )
 from hallucination_detector.features.schema import load_feature_schema
+from hallucination_detector.features.preprocessing import normalize_text
 
 logger = logging.getLogger(__name__)
 
@@ -71,13 +72,16 @@ def _compute_file_checksum(path: Path) -> str:
 
 
 def load_split_examples(split: str) -> List[Dict[str, Any]]:
-    """Load expanded examples for a split from Phase 2 processed data."""
+    """Load Phase 2 rows and normalize model text in memory, preserving IDs."""
     path = PROCESSED_DIR / f"halueval_expanded_{split}.jsonl"
     examples = []
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
             if line.strip():
-                examples.append(json.loads(line))
+                example = json.loads(line)
+                for field in ("question", "candidate_answer", "reference_context"):
+                    example[field] = normalize_text(example[field])
+                examples.append(example)
     return examples
 
 
@@ -89,7 +93,7 @@ def _deduplicate_texts(
     unique: List[str] = []
     index_map: List[int] = []
     for ex in examples:
-        text = ex[field]
+        text = normalize_text(ex[field])
         h = hashlib.sha256(text.encode("utf-8")).hexdigest()
         if h not in seen:
             seen[h] = len(unique)
