@@ -1,0 +1,246 @@
+[
+  {
+    "example_id": "6fb2c1c8065c1ee2cacbc0c01d6176dca6bfdc32d5aecec51d652b8f6c8325b7",
+    "context_excerpts": [
+      "the ironing, nagging wife of Laverne Nagger (Gordie Tapp)."
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference explicitly identifies Gordie Tapp as the actor playing the husband. The candidate is an awkward, overlong copied fragment but includes that answer and makes no evident unsupported claim. Its rejection is an apparent grounding-classification failure; the cause is unclear, and verbosity is only a possible shortcut cue."
+  },
+  {
+    "example_id": "cce4e9e660c32087894e0e2e59c5b5d7c23e5827669ce111c5605bb443a13961",
+    "context_excerpts": [
+      "Advancing military technology, including iron clad ships and long range guns, made the fort obsolete before it could be used."
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The answer repeats the reference explanation verbatim and directly answers why the fort was unused. The model rejects supported content. Its sentence length is consistent with a possible style shortcut, but the score alone cannot establish that mechanism."
+  },
+  {
+    "example_id": "d09c1c0ef42ad005a3cbf73f3c9441d0e617014e363f1453302aa6151606d44d",
+    "context_excerpts": [
+      "based on the novel of the same name by Cormac McCarthy.",
+      "He has written ten novels,"
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The context links the novel to McCarthy and explicitly gives ten novels. The candidate repeats that count. This is a supported numerical answer rejected by the model, not a numerical hallucination in the answer."
+  },
+  {
+    "example_id": "cb73c13ec734c931071db5d7e59374e94f316ba3d3051ebc07d02327babe1042",
+    "context_excerpts": [
+      "It was created by Nick Park and Aardman Animations.",
+      "Park has been nominated for an Academy Award a total of six times, and won four with \"Creature Comforts\""
+    ],
+    "categories": [
+      "partial correctness"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The answer accurately quotes four wins and identifies Park by surname. It omits Aardman and the first name from the creation clause, making it incomplete for the two-part question, but no asserted fact contradicts the reference. Incompleteness should not itself be equated with hallucination; the high score rejects supported content."
+  },
+  {
+    "example_id": "b4d0806e920850908040a0b0333a7959c97adb3b9ffba28ca14f18cb839f82fd",
+    "context_excerpts": [
+      "signed into law by President Jimmy Carter on May 23, 1977.",
+      "A member of the Democratic Party,"
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference links the signer Carter to the Democratic Party. The long biographical answer includes the correct affiliation and copies supported details. Rejecting it is a model error under the benchmark; a style-based cause remains speculative."
+  },
+  {
+    "example_id": "e9814d95b5b6cd321a800fdca66936afdad9d108111ed335406daea5a423f10b",
+    "context_excerpts": [
+      "a Japanese alpinist who skied down Mt. Everest in 1970.",
+      "The Plow That Broke the Plains is a 1936 short documentary film"
+    ],
+    "categories": [
+      "context ambiguity"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The reference explicitly dates Plow to 1936 and places the event depicted by the other documentary in 1970, supporting the apparent ordering. It does not give that documentary's release date. The benchmark answer is plausible, but this is indirect temporal evidence rather than a complete release-date comparison. The false-positive designation follows the unchanged label."
+  },
+  {
+    "example_id": "c2dc0582437aba97a8ee86dddbdd89873ae82b78daf895d9423663c788e859b1",
+    "context_excerpts": [
+      "He was known for his distinctive, soulful voice, eclectic mix of musical styles on his albums, combining soul, jazz, rock, pop, reggae, blues, and sartorial acumen."
+    ],
+    "categories": [
+      "context ambiguity"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The answer is a verbatim trait in the reference and fits the question's requested distinction. However, the context uses unresolved male pronouns and does not name Palmer or establish two-continent popularity. The model may have rejected a supported phrase, but attribution and the causal framing cannot be fully checked here. This is not evidence that the candidate is false."
+  },
+  {
+    "example_id": "3de63ecf11d3a0a71e8729527e09288061511308cf9e7242eee72bd69defdbbf",
+    "context_excerpts": [
+      "The Chester Mystery Plays is a cycle of mystery plays dating back to at least the early part of the 15th century."
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The named cycle and its early-15th-century dating are explicit. The short candidate directly answers the question and is supported. This false positive also shows that the observed errors cannot all be explained simply as rejection of long answers."
+  },
+  {
+    "example_id": "10252113c9d395221f93853ca1a86924e1b6fcb833d90753601fc52862556aa2",
+    "context_excerpts": [
+      "The 11th Hour is a 2007 documentary film, created, produced, co-written and narrated by Leonardo DiCaprio,"
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference directly names DiCaprio as co-writer of the requested film. The concise answer is supported, so the high score is a model classification error. The evidence does not establish which interaction or scalar feature drove it."
+  },
+  {
+    "example_id": "e9b561e7c6334606692fcd82ce769187e52fddb9f0bb7fe224d4aa6a84523cc1",
+    "context_excerpts": [
+      "Plautdietsch or Mennonite Low German, was originally a Low Prussian dialect of East Low German, with Dutch influence,"
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference explicitly names Plautdietsch and describes the dialect requested. The question's first-language framing is not fully spelled out, but the candidate identifies the described language without adding that claim. The model rejects a supported identification."
+  },
+  {
+    "example_id": "5b8b3102033b39d059e98f8cfc5fe80c3ff85277e7f88b62c1550aea3bda28f2",
+    "context_excerpts": [
+      "H. Frank Carey High School is a public high school located in Franklin Square, New York"
+    ],
+    "categories": [
+      "dataset/label anomaly"
+    ],
+    "judgment": "dataset/label anomaly",
+    "analyst_explanation": "Franklin Square directly matches the stated school location. Although the benchmark marks this candidate Hallucinated, the provided evidence supports the model's Grounded decision. This is an apparent label anomaly, not a demonstrated factual failure by the model. The benchmark label remains 1."
+  },
+  {
+    "example_id": "3f8d862c7e69a9c5c1f79763d08932aca1113de72a214961d874057df155340f",
+    "context_excerpts": [
+      "Dell Technologies Inc. is an American multinational information technology corporation",
+      "Dell EMC (EMC Corporation until 2016)"
+    ],
+    "categories": [
+      "dataset/label anomaly",
+      "context ambiguity"
+    ],
+    "judgment": "dataset/label anomaly",
+    "analyst_explanation": "EMC Corporation is explicitly the earlier name of Dell EMC. If that is the intended company, the candidate is supported despite label 1. The question only says the company and the context mentions two companies, so the referent is ambiguous. Flagged as an apparent label anomaly conditional on Dell EMC, without revising the benchmark."
+  },
+  {
+    "example_id": "b1d5173beb71ece366b07bcdbbcdda371f46b785c27b15c3dd03c239786035ba",
+    "context_excerpts": [
+      "Beate Bille was the mother of astronomer Tycho Brahe.",
+      "born Tyge Ottesen Brahe"
+    ],
+    "categories": [
+      "high lexical overlap but incorrect meaning",
+      "context ambiguity"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "Brahe occurs in both displayed names, but occurrence alone does not establish it as the requested middle name. The birth-name sequence instead places Ottesen between Tyge and Brahe; the reference does not explicitly classify name components. Accepting Brahe may confuse name membership with name role, but the question's naming convention remains unclear."
+  },
+  {
+    "example_id": "a7fa8802415a963225a222a1f4febd5f4bad26ff584cc85ff71f963e11faf4e1",
+    "context_excerpts": [
+      "\"Special 26\" released on February 5, 2013"
+    ],
+    "categories": [
+      "numerical hallucination",
+      "contradiction",
+      "high lexical overlap but incorrect meaning"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The candidate changes February to January while retaining the day and year. It directly conflicts with the provided release date. The low score accepts a compact near-match containing a substantive date error; lexical similarity is a possible explanation, not an established cause."
+  },
+  {
+    "example_id": "ff388e1567f7211f44e47a55703eafbc7768839bdfbaaffa645be36ce4835d39",
+    "context_excerpts": [
+      "Ferrari Store,",
+      "Ferrari N.V.",
+      "is an Italian sports car manufacturer based in Maranello."
+    ],
+    "categories": [
+      "entity substitution",
+      "plausible but unsupported"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference links the listed Ferrari store to a manufacturer based in Maranello. The candidate substitutes Lamborghini and adds Rome, neither supported here, and the stated city fails the Maranello condition in the question. This supports a model error without asserting any external fact about Lamborghini's actual headquarters."
+  },
+  {
+    "example_id": "c846edde857af80683c4b09a75241470041dca1620aa50866f6207965514db56",
+    "context_excerpts": [
+      "Moves was a wargaming magazine originally published by SPI",
+      "The Artist's Magazine is a monthly magazine for artists published by F+W Media"
+    ],
+    "categories": [
+      "plausible but unsupported",
+      "other/unclear"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The shared action explicit in the reference is publication. The answer edited supplies a different action without reference support. Magazines might also be edited, but that cannot be confirmed or disproved from this context. The model accepts an unsupported response; the evidence does not show a direct factual contradiction."
+  },
+  {
+    "example_id": "c291aea3db7cedc18eadd310837dfe63f8bf881fd043a674d6bf7dd081863a3f",
+    "context_excerpts": [
+      "the Southern Baptist Convention, the largest non-Catholic Christian denomination in the United States,"
+    ],
+    "categories": [
+      "partial correctness",
+      "context ambiguity"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The reference names the Southern Baptist Convention; The Baptist Church is a broader and less specific designation. It shares Baptist terminology but does not identify the exact organization. The text also does not explicitly connect Moore to heading it. This is a plausible specificity failure, with insufficient evidence to resolve whether the generic wording is acceptable."
+  },
+  {
+    "example_id": "e8f2e2dd17e47da7ef2917c95e38af31c83bd29c8553c4aac2a02cf0e6349fdf",
+    "context_excerpts": [
+      "The Champaign Aviation Museum is an aviation museum in Urbana, Ohio, United States."
+    ],
+    "categories": [
+      "entity substitution",
+      "contradiction"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The requested country is explicitly United States, whereas the candidate says Saudi Arabia. This is a direct country substitution contradicted by the reference, accepted with a very low hallucination score. The long question and short answer do not by themselves explain the decision."
+  },
+  {
+    "example_id": "2df0e9170ef437201fbe6f353fa96f0c582df7f096a3a6f54dc2fd0d5e11f777",
+    "context_excerpts": [
+      "Seth Adham Curry",
+      "for the Dallas Mavericks",
+      "Wardell Stephen Curry II",
+      "for the Golden State Warriors"
+    ],
+    "categories": [
+      "context ambiguity",
+      "other/unclear"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The context associates each player with a team but supplies neither team locations nor distances to New Orleans. It cannot establish the requested geographic comparison using only the provided evidence. The benchmark marks Stephen Curry wrong, but this review cannot independently resolve the answer or infer that missing distance information makes it false."
+  },
+  {
+    "example_id": "af7f6813d04d98455c360a891f8eae27c022283beeacfb27039c559d982f3d33",
+    "context_excerpts": [
+      "\"Open Road\" (Andy García, Juliette Lewis and Camilla Belle)",
+      "\"Experimenter\" (written and directed by Michael Almereyda) with Peter Sarsgaard and Winona Ryder.",
+      "As Lydia Deetz, a goth teenager in Tim Burton's \"Beetlejuice\" (1988), she won critical acclaim"
+    ],
+    "categories": [
+      "entity substitution",
+      "context ambiguity"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The supplied sequence links Winona Ryder with Experimenter and then describes the Lydia Deetz role. The candidate instead chooses another listed film, Open Road, whose listed performers differ. This is a likely wrong-film association accepted by the model. The final she is implicit and the cast lists need not be exhaustive, so the text supports the intended mismatch without proving Ryder could never appear in Open Road."
+  }
+]

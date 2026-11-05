@@ -1,0 +1,59 @@
+{
+  "categories": {
+    "entity substitution": {
+      "FP": 0,
+      "FN": 3,
+      "total": 3
+    },
+    "numerical hallucination": {
+      "FP": 0,
+      "FN": 1,
+      "total": 1
+    },
+    "contradiction": {
+      "FP": 0,
+      "FN": 2,
+      "total": 2
+    },
+    "high lexical overlap but incorrect meaning": {
+      "FP": 0,
+      "FN": 2,
+      "total": 2
+    },
+    "plausible but unsupported": {
+      "FP": 0,
+      "FN": 2,
+      "total": 2
+    },
+    "partial correctness": {
+      "FP": 1,
+      "FN": 1,
+      "total": 2
+    },
+    "context ambiguity": {
+      "FP": 2,
+      "FN": 5,
+      "total": 7
+    },
+    "evidence missed through chunk selection": {
+      "FP": 0,
+      "FN": 0,
+      "total": 0
+    },
+    "dataset/label anomaly": {
+      "FP": 0,
+      "FN": 2,
+      "total": 2
+    },
+    "other/unclear": {
+      "FP": 7,
+      "FN": 2,
+      "total": 9
+    }
+  },
+  "judgments": {
+    "model error": 12,
+    "unclear judgment": 6,
+    "dataset/label anomaly": 2
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0.0",
+  "model": "mlp",
+  "seed": 202,
+  "threshold": 0.3784696161746979,
+  "limit_per_error_type": 10,
+  "confusion_matrix": [
+    [
+      1423,
+      77
+    ],
+    [
+      105,
+      1395
+    ]
+  ],
+  "available": {
+    "FP": 77,
+    "FN": 105
+  },
+  "reviewed": {
+    "FP": 10,
+    "FN": 10
+  },
+  "scope": "Original final-test saved predictions only; no inference, training, tuning or changed decisions.",
+  "selection_policy": "FP: true 0, predicted 1, score descending. FN: true 1, predicted 0, score ascending. Both: example_id ascending for equal scores; first 10 or all available if fewer. Predicted Hallucinated iff score >= locked validation threshold.",
+  "score_interpretation": "Extreme model scores; not calibrated probabilities or proven confidence",
+  "selected_example_ids": [
+    "6fb2c1c8065c1ee2cacbc0c01d6176dca6bfdc32d5aecec51d652b8f6c8325b7",
+    "cce4e9e660c32087894e0e2e59c5b5d7c23e5827669ce111c5605bb443a13961",
+    "d09c1c0ef42ad005a3cbf73f3c9441d0e617014e363f1453302aa6151606d44d",
+    "cb73c13ec734c931071db5d7e59374e94f316ba3d3051ebc07d02327babe1042",
+    "b4d0806e920850908040a0b0333a7959c97adb3b9ffba28ca14f18cb839f82fd",
+    "e9814d95b5b6cd321a800fdca66936afdad9d108111ed335406daea5a423f10b",
+    "c2dc0582437aba97a8ee86dddbdd89873ae82b78daf895d9423663c788e859b1",
+    "3de63ecf11d3a0a71e8729527e09288061511308cf9e7242eee72bd69defdbbf",
+    "10252113c9d395221f93853ca1a86924e1b6fcb833d90753601fc52862556aa2",
+    "e9b561e7c6334606692fcd82ce769187e52fddb9f0bb7fe224d4aa6a84523cc1",
+    "5b8b3102033b39d059e98f8cfc5fe80c3ff85277e7f88b62c1550aea3bda28f2",
+    "3f8d862c7e69a9c5c1f79763d08932aca1113de72a214961d874057df155340f",
+    "b1d5173beb71ece366b07bcdbbcdda371f46b785c27b15c3dd03c239786035ba",
+    "a7fa8802415a963225a222a1f4febd5f4bad26ff584cc85ff71f963e11faf4e1",
+    "ff388e1567f7211f44e47a55703eafbc7768839bdfbaaffa645be36ce4835d39",
+    "c846edde857af80683c4b09a75241470041dca1620aa50866f6207965514db56",
+    "c291aea3db7cedc18eadd310837dfe63f8bf881fd043a674d6bf7dd081863a3f",
+    "e8f2e2dd17e47da7ef2917c95e38af31c83bd29c8553c4aac2a02cf0e6349fdf",
+    "2df0e9170ef437201fbe6f353fa96f0c582df7f096a3a6f54dc2fd0d5e11f777",
+    "af7f6813d04d98455c360a891f8eae27c022283beeacfb27039c559d982f3d33"
+  ],
+  "input_checksums": {
+    "results/metrics/phase6/primary_predictions.csv": "f77801113b3e94b45181a4a5c1edb779f875476321b7bf7a8b4bb5b1d75b6040",
+    "results/metrics/phase6/primary_metrics.json": "2f74cd501cd1861e6d7475ad871018e7eaaff507d556452ab7a7523584a1669f",
+    "results/metrics/phase6/evaluation_manifest.json": "916936b61f60843b55e9a82be208d54c64f938cfdc8a9054e01aaa4b7a28d4b1",
+    "results/metrics/phase6/primary_saved.json": "f03342ef09a13e357ecbb2dca02dd5197efdadc04a3e3189b9149da5ac5c4d50",
+    "data/processed/halueval_expanded_test.jsonl": "fcb184f045a67339db23f7197f8bc898c6494ef823e6c74b0ecc151c6186c526",
+    "results/metrics/phase5_validation.json": "73ac50f2dcb2c48d2bae67fbc5d08691d402273f6a5b2d19fce2859575242deb"
+  },
+  "analyst_notes_checksum": "5a5b5acb3914b478397762b69b2a16295d787b4fb3082a8fac6b11de683b71a0"
+}

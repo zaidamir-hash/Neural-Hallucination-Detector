@@ -1,0 +1,506 @@
+[
+  {
+    "example_id": "6fb2c1c8065c1ee2cacbc0c01d6176dca6bfdc32d5aecec51d652b8f6c8325b7",
+    "source_id": "e5c9850fc858af84cf345d15c92943bacc19f48813c54c1991d749a2d8a38eb5",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.9992037415504456,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.6207341253757477,
+    "absolute_distance": 0.6207341253757477,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Who played the onscreen husband of a variety show banjo player?",
+    "candidate_answer": "banjo player and former member of the television variety show \"Hee Haw\" gang having played the role of Ida Lee Nagger, the ironing, nagging wife of Laverne Nagger (Gordie Tapp).",
+    "rank": 1,
+    "context_excerpts": [
+      "the ironing, nagging wife of Laverne Nagger (Gordie Tapp)."
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference explicitly identifies Gordie Tapp as the actor playing the husband. The candidate is an awkward, overlong copied fragment but includes that answer and makes no evident unsupported claim. Its rejection is an apparent grounding-classification failure; the cause is unclear, and verbosity is only a possible shortcut cue."
+  },
+  {
+    "example_id": "cce4e9e660c32087894e0e2e59c5b5d7c23e5827669ce111c5605bb443a13961",
+    "source_id": "e4bd77ac965a0264ecbd6cc235969fbdd19a93290ba06a06e0a7de71958fb31f",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.9983362555503845,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.6198666393756866,
+    "absolute_distance": 0.6198666393756866,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Why was the fort viewable from Willard Beach never used? ",
+    "candidate_answer": "Advancing military technology, including iron clad ships and long range guns, made the fort obsolete before it could be used.",
+    "rank": 2,
+    "context_excerpts": [
+      "Advancing military technology, including iron clad ships and long range guns, made the fort obsolete before it could be used."
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The answer repeats the reference explanation verbatim and directly answers why the fort was unused. The model rejects supported content. Its sentence length is consistent with a possible style shortcut, but the score alone cannot establish that mechanism."
+  },
+  {
+    "example_id": "d09c1c0ef42ad005a3cbf73f3c9441d0e617014e363f1453302aa6151606d44d",
+    "source_id": "834e3f07ddcfcfbf03dbd460d664ae9241f31277cbeb0b2edef276c9ed97a2be",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.995582640171051,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.6171130239963531,
+    "absolute_distance": 0.6171130239963531,
+    "model": "mlp",
+    "seed": 202,
+    "question": "How many novels has the author of the novel Child of God written?",
+    "candidate_answer": "He has written ten novels",
+    "rank": 3,
+    "context_excerpts": [
+      "based on the novel of the same name by Cormac McCarthy.",
+      "He has written ten novels,"
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The context links the novel to McCarthy and explicitly gives ten novels. The candidate repeats that count. This is a supported numerical answer rejected by the model, not a numerical hallucination in the answer."
+  },
+  {
+    "example_id": "cb73c13ec734c931071db5d7e59374e94f316ba3d3051ebc07d02327babe1042",
+    "source_id": "fbd45ba3aedda66d9c0480255d6735bb10f6d33ffe477753c61d1c57dd4b1795",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.9909132719039917,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.6124436557292938,
+    "absolute_distance": 0.6124436557292938,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Who created Creature comforts and how many academy awards did he win? ",
+    "candidate_answer": "Park has been nominated for an Academy Award a total of six times, and won four with \"Creature Comforts\"",
+    "rank": 4,
+    "context_excerpts": [
+      "It was created by Nick Park and Aardman Animations.",
+      "Park has been nominated for an Academy Award a total of six times, and won four with \"Creature Comforts\""
+    ],
+    "categories": [
+      "partial correctness"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The answer accurately quotes four wins and identifies Park by surname. It omits Aardman and the first name from the creation clause, making it incomplete for the two-part question, but no asserted fact contradicts the reference. Incompleteness should not itself be equated with hallucination; the high score rejects supported content."
+  },
+  {
+    "example_id": "b4d0806e920850908040a0b0333a7959c97adb3b9ffba28ca14f18cb839f82fd",
+    "source_id": "4ce16f419345e7d21b7fafd26f8ed001984413a942d7cedfe427f1b2bd90ad38",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.9736667275428772,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.5951971113681793,
+    "absolute_distance": 0.5951971113681793,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Was the president who signed the The Tax Reduction and Simplification Act of 1977 a Republican or Democrat?",
+    "candidate_answer": "James Earl Carter Jr. (born October 1, 1924) is an American politician who served as the 39th President of the United States from 1977 to 1981. A member of the Democratic Party,",
+    "rank": 5,
+    "context_excerpts": [
+      "signed into law by President Jimmy Carter on May 23, 1977.",
+      "A member of the Democratic Party,"
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference links the signer Carter to the Democratic Party. The long biographical answer includes the correct affiliation and copies supported details. Rejecting it is a model error under the benchmark; a style-based cause remains speculative."
+  },
+  {
+    "example_id": "e9814d95b5b6cd321a800fdca66936afdad9d108111ed335406daea5a423f10b",
+    "source_id": "d20d7b47257bb34aa8438d8b459a34ea89e511a7de05a3e9f553dc5b286ad25c",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.9603509306907654,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.5818813145160675,
+    "absolute_distance": 0.5818813145160675,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Which was released first, The Plow That Broke the Plains or The Man Who Skied Down Everest?",
+    "candidate_answer": "The Plow That Broke the Plains",
+    "rank": 6,
+    "context_excerpts": [
+      "a Japanese alpinist who skied down Mt. Everest in 1970.",
+      "The Plow That Broke the Plains is a 1936 short documentary film"
+    ],
+    "categories": [
+      "context ambiguity"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The reference explicitly dates Plow to 1936 and places the event depicted by the other documentary in 1970, supporting the apparent ordering. It does not give that documentary's release date. The benchmark answer is plausible, but this is indirect temporal evidence rather than a complete release-date comparison. The false-positive designation follows the unchanged label."
+  },
+  {
+    "example_id": "c2dc0582437aba97a8ee86dddbdd89873ae82b78daf895d9423663c788e859b1",
+    "source_id": "775869cdac23100e907b09866740ec98cf3b931632d8253721e4087baa465c4b",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.9529461860656738,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.574476569890976,
+    "absolute_distance": 0.574476569890976,
+    "model": "mlp",
+    "seed": 202,
+    "question": "While both singer-songwriters have displayed incredible talent, what sets Robert Palmer apart from Wayne Coyne, causing him to gain populatiry in two continents?",
+    "candidate_answer": "eclectic mix of musical styles",
+    "rank": 7,
+    "context_excerpts": [
+      "He was known for his distinctive, soulful voice, eclectic mix of musical styles on his albums, combining soul, jazz, rock, pop, reggae, blues, and sartorial acumen."
+    ],
+    "categories": [
+      "context ambiguity"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The answer is a verbatim trait in the reference and fits the question's requested distinction. However, the context uses unresolved male pronouns and does not name Palmer or establish two-continent popularity. The model may have rejected a supported phrase, but attribution and the causal framing cannot be fully checked here. This is not evidence that the candidate is false."
+  },
+  {
+    "example_id": "3de63ecf11d3a0a71e8729527e09288061511308cf9e7242eee72bd69defdbbf",
+    "source_id": "2827040d81508458c8db0a5fcf53322f5191ca005417cab91095edb0cba50f05",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.9384365081787109,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.5599668920040131,
+    "absolute_distance": 0.5599668920040131,
+    "model": "mlp",
+    "seed": 202,
+    "question": "What mystery play can be dated back to medieval theater in the early 15th century?",
+    "candidate_answer": "The Chester Mystery Plays",
+    "rank": 8,
+    "context_excerpts": [
+      "The Chester Mystery Plays is a cycle of mystery plays dating back to at least the early part of the 15th century."
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The named cycle and its early-15th-century dating are explicit. The short candidate directly answers the question and is supported. This false positive also shows that the observed errors cannot all be explained simply as rejection of long answers."
+  },
+  {
+    "example_id": "10252113c9d395221f93853ca1a86924e1b6fcb833d90753601fc52862556aa2",
+    "source_id": "abca19356aa9dd9ef688aa77515a4a6cf4030e93eb71705b9869c776aaf99044",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.9312441349029541,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.5527745187282562,
+    "absolute_distance": 0.5527745187282562,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Name the American actor, film producer and environmentalist activist who co-wrote the '11th Hour', a 2007 documentary film about the state of the natural environment, distributed by Warner Independent Pictures?",
+    "candidate_answer": "Leonardo DiCaprio",
+    "rank": 9,
+    "context_excerpts": [
+      "The 11th Hour is a 2007 documentary film, created, produced, co-written and narrated by Leonardo DiCaprio,"
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference directly names DiCaprio as co-writer of the requested film. The concise answer is supported, so the high score is a model classification error. The evidence does not establish which interaction or scalar feature drove it."
+  },
+  {
+    "example_id": "e9b561e7c6334606692fcd82ce769187e52fddb9f0bb7fe224d4aa6a84523cc1",
+    "source_id": "13ae2c5febfea5d84058c2fd599aaff8183c9fbc7ab3653e4c283e98119f36cd",
+    "error_type": "FP",
+    "true_label": 0,
+    "predicted_label": 1,
+    "hallucination_score": 0.9245011210441589,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": 0.5460315048694611,
+    "absolute_distance": 0.5460315048694611,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Mennonites are traditionally multilingual with which Low Prussian dialect of East Low German, with Dutch influence language was their first?",
+    "candidate_answer": "Plautdietsch",
+    "rank": 10,
+    "context_excerpts": [
+      "Plautdietsch or Mennonite Low German, was originally a Low Prussian dialect of East Low German, with Dutch influence,"
+    ],
+    "categories": [
+      "other/unclear"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference explicitly names Plautdietsch and describes the dialect requested. The question's first-language framing is not fully spelled out, but the candidate identifies the described language without adding that claim. The model rejects a supported identification."
+  },
+  {
+    "example_id": "5b8b3102033b39d059e98f8cfc5fe80c3ff85277e7f88b62c1550aea3bda28f2",
+    "source_id": "8694a0645879f39e6aeb39b2f893b1aeea9a100d7b0b75d07031a0e7754c2aed",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.0006037272396497428,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.37786588893504813,
+    "absolute_distance": 0.37786588893504813,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Where is H. Frank Carey Junior-Senior High School?",
+    "candidate_answer": "Franklin Square",
+    "rank": 1,
+    "context_excerpts": [
+      "H. Frank Carey High School is a public high school located in Franklin Square, New York"
+    ],
+    "categories": [
+      "dataset/label anomaly"
+    ],
+    "judgment": "dataset/label anomaly",
+    "analyst_explanation": "Franklin Square directly matches the stated school location. Although the benchmark marks this candidate Hallucinated, the provided evidence supports the model's Grounded decision. This is an apparent label anomaly, not a demonstrated factual failure by the model. The benchmark label remains 1."
+  },
+  {
+    "example_id": "3f8d862c7e69a9c5c1f79763d08932aca1113de72a214961d874057df155340f",
+    "source_id": "497de7a9d60b29769270f48e717f05984e9df3ee206c3caae981517334b2c118",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.0009992412524297833,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.3774703749222681,
+    "absolute_distance": 0.3774703749222681,
+    "model": "mlp",
+    "seed": 202,
+    "question": "What was the company orginally named first?",
+    "candidate_answer": "EMC Corporation",
+    "rank": 2,
+    "context_excerpts": [
+      "Dell Technologies Inc. is an American multinational information technology corporation",
+      "Dell EMC (EMC Corporation until 2016)"
+    ],
+    "categories": [
+      "dataset/label anomaly",
+      "context ambiguity"
+    ],
+    "judgment": "dataset/label anomaly",
+    "analyst_explanation": "EMC Corporation is explicitly the earlier name of Dell EMC. If that is the intended company, the candidate is supported despite label 1. The question only says the company and the context mentions two companies, so the referent is ambiguous. Flagged as an apparent label anomaly conditional on Dell EMC, without revising the benchmark."
+  },
+  {
+    "example_id": "b1d5173beb71ece366b07bcdbbcdda371f46b785c27b15c3dd03c239786035ba",
+    "source_id": "24ac1ab856e5dc106f4c870a0908687ea03dcfbb256f117cc5335d86ef5eab9d",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.001525453059002757,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.3769441631156951,
+    "absolute_distance": 0.3769441631156951,
+    "model": "mlp",
+    "seed": 202,
+    "question": "What is the middle name of Beate Clausdatter Bille's Son ?",
+    "candidate_answer": "Brahe",
+    "rank": 3,
+    "context_excerpts": [
+      "Beate Bille was the mother of astronomer Tycho Brahe.",
+      "born Tyge Ottesen Brahe"
+    ],
+    "categories": [
+      "high lexical overlap but incorrect meaning",
+      "context ambiguity"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "Brahe occurs in both displayed names, but occurrence alone does not establish it as the requested middle name. The birth-name sequence instead places Ottesen between Tyge and Brahe; the reference does not explicitly classify name components. Accepting Brahe may confuse name membership with name role, but the question's naming convention remains unclear."
+  },
+  {
+    "example_id": "a7fa8802415a963225a222a1f4febd5f4bad26ff584cc85ff71f963e11faf4e1",
+    "source_id": "284bbdd7a22991a6c3ae486e21562acb87571120528e5aa08c1843f9dcb2e56d",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.0017805920215323567,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.3766890241531655,
+    "absolute_distance": 0.3766890241531655,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Surinder Sodhi composed the music for special 26, when was it relieced. ",
+    "candidate_answer": "January 5, 2013",
+    "rank": 4,
+    "context_excerpts": [
+      "\"Special 26\" released on February 5, 2013"
+    ],
+    "categories": [
+      "numerical hallucination",
+      "contradiction",
+      "high lexical overlap but incorrect meaning"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The candidate changes February to January while retaining the day and year. It directly conflicts with the provided release date. The low score accepts a compact near-match containing a substantive date error; lexical similarity is a possible explanation, not an established cause."
+  },
+  {
+    "example_id": "ff388e1567f7211f44e47a55703eafbc7768839bdfbaaffa645be36ce4835d39",
+    "source_id": "bf04b284f95b0d3cb3b4a46f999b79a3faf488458fed085aee663880e73aad43",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.0023260388989001513,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.3761435772757977,
+    "absolute_distance": 0.3761435772757977,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Which brand shop in Beverly Center is based in Maranello ?",
+    "candidate_answer": "Lamborghini, based in Rome.",
+    "rank": 5,
+    "context_excerpts": [
+      "Ferrari Store,",
+      "Ferrari N.V.",
+      "is an Italian sports car manufacturer based in Maranello."
+    ],
+    "categories": [
+      "entity substitution",
+      "plausible but unsupported"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The reference links the listed Ferrari store to a manufacturer based in Maranello. The candidate substitutes Lamborghini and adds Rome, neither supported here, and the stated city fails the Maranello condition in the question. This supports a model error without asserting any external fact about Lamborghini's actual headquarters."
+  },
+  {
+    "example_id": "c846edde857af80683c4b09a75241470041dca1620aa50866f6207965514db56",
+    "source_id": "545f27fa69dcbf3917d3e6b903af692ddc6f2681868f53408796081ef01fdf97",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.004787256941199303,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.3736823592334986,
+    "absolute_distance": 0.3736823592334986,
+    "model": "mlp",
+    "seed": 202,
+    "question": "What action does Moves and The Artist's Magazine have in common?",
+    "candidate_answer": "edited",
+    "rank": 6,
+    "context_excerpts": [
+      "Moves was a wargaming magazine originally published by SPI",
+      "The Artist's Magazine is a monthly magazine for artists published by F+W Media"
+    ],
+    "categories": [
+      "plausible but unsupported",
+      "other/unclear"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The shared action explicit in the reference is publication. The answer edited supplies a different action without reference support. Magazines might also be edited, but that cannot be confirmed or disproved from this context. The model accepts an unsupported response; the evidence does not show a direct factual contradiction."
+  },
+  {
+    "example_id": "c291aea3db7cedc18eadd310837dfe63f8bf881fd043a674d6bf7dd081863a3f",
+    "source_id": "4fcf0eb6f77d8bd971e6b2e91fc0193a0e4743e526ede008c3cac8df85978593",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.006141933146864176,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.3723276830278337,
+    "absolute_distance": 0.3723276830278337,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Which is the largest non-Catholic Christian denomination in the United States headed by Russell D. Moore, an American evangelical theologian, ethicist, and preacher?",
+    "candidate_answer": "The Baptist Church",
+    "rank": 7,
+    "context_excerpts": [
+      "the Southern Baptist Convention, the largest non-Catholic Christian denomination in the United States,"
+    ],
+    "categories": [
+      "partial correctness",
+      "context ambiguity"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The reference names the Southern Baptist Convention; The Baptist Church is a broader and less specific designation. It shares Baptist terminology but does not identify the exact organization. The text also does not explicitly connect Moore to heading it. This is a plausible specificity failure, with insufficient evidence to resolve whether the generic wording is acceptable."
+  },
+  {
+    "example_id": "e8f2e2dd17e47da7ef2917c95e38af31c83bd29c8553c4aac2a02cf0e6349fdf",
+    "source_id": "bb21fd3d2a6c5e660c82eab333d347394e8a893a9960e51e6e0300d338baecd8",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.006353992968797684,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.3721156232059002,
+    "absolute_distance": 0.3721156232059002,
+    "model": "mlp",
+    "seed": 202,
+    "question": "The Champaign Aviation Museum is an aviation museum in Urbana, Ohio, in which country, the museum and its volunteers are restoring a B-17 Flying Fortress back to flying status, a our-engine heavy bomber developed in the 1930s for the United States Army Air Corps (USAAC)?",
+    "candidate_answer": "Saudi Arabia",
+    "rank": 8,
+    "context_excerpts": [
+      "The Champaign Aviation Museum is an aviation museum in Urbana, Ohio, United States."
+    ],
+    "categories": [
+      "entity substitution",
+      "contradiction"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The requested country is explicitly United States, whereas the candidate says Saudi Arabia. This is a direct country substitution contradicted by the reference, accepted with a very low hallucination score. The long question and short answer do not by themselves explain the decision."
+  },
+  {
+    "example_id": "2df0e9170ef437201fbe6f353fa96f0c582df7f096a3a6f54dc2fd0d5e11f777",
+    "source_id": "df64954eeed8979b3f73935b6caea5c9245df38759099b926be5d01030e630bd",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.006739343516528606,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.37173027265816927,
+    "absolute_distance": 0.37173027265816927,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Which players' team, Seth or Stephen Curry, is closer to New Orleans?",
+    "candidate_answer": "Stephen Curry",
+    "rank": 9,
+    "context_excerpts": [
+      "Seth Adham Curry",
+      "for the Dallas Mavericks",
+      "Wardell Stephen Curry II",
+      "for the Golden State Warriors"
+    ],
+    "categories": [
+      "context ambiguity",
+      "other/unclear"
+    ],
+    "judgment": "unclear judgment",
+    "analyst_explanation": "The context associates each player with a team but supplies neither team locations nor distances to New Orleans. It cannot establish the requested geographic comparison using only the provided evidence. The benchmark marks Stephen Curry wrong, but this review cannot independently resolve the answer or infer that missing distance information makes it false."
+  },
+  {
+    "example_id": "af7f6813d04d98455c360a891f8eae27c022283beeacfb27039c559d982f3d33",
+    "source_id": "4364394dc0dbef6eae67f0e8fc5de002187340cbc50aaa7fc7443d9e124b91de",
+    "error_type": "FN",
+    "true_label": 1,
+    "predicted_label": 0,
+    "hallucination_score": 0.008282467722892761,
+    "threshold": 0.3784696161746979,
+    "score_minus_threshold": -0.3701871484518051,
+    "absolute_distance": 0.3701871484518051,
+    "model": "mlp",
+    "seed": 202,
+    "question": "Which movie produced by Uri Singer stars the actress who won critical acclaim with her appearance as Lydia Deetz in Tim Burton's \"Beetlejuice\"?",
+    "candidate_answer": "\"Open Road\"",
+    "rank": 10,
+    "context_excerpts": [
+      "\"Open Road\" (Andy García, Juliette Lewis and Camilla Belle)",
+      "\"Experimenter\" (written and directed by Michael Almereyda) with Peter Sarsgaard and Winona Ryder.",
+      "As Lydia Deetz, a goth teenager in Tim Burton's \"Beetlejuice\" (1988), she won critical acclaim"
+    ],
+    "categories": [
+      "entity substitution",
+      "context ambiguity"
+    ],
+    "judgment": "model error",
+    "analyst_explanation": "The supplied sequence links Winona Ryder with Experimenter and then describes the Lydia Deetz role. The candidate instead chooses another listed film, Open Road, whose listed performers differ. This is a likely wrong-film association accepted by the model. The final she is implicit and the cast lists need not be exhaustive, so the text supports the intended mismatch without proving Ryder could never appear in Open Road."
+  }
+]

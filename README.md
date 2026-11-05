@@ -146,7 +146,19 @@ Verification: the original suite passed 130 tests; the completed suite passed **
 
 Qualitative error analysis
 --------------------------
-Not started (Phase 7, outside the authorized Phase 6 scope). Representative seed 202 predictions and IDs are preserved for the handoff; no high-confidence error review has been performed.
+Phase 7 is complete: [all 20 reviewed cases and findings](results/error_analysis/phase7/report.md), [machine-readable reviewed table](results/error_analysis/phase7/reviewed_cases.json), [selection and input checksums](results/error_analysis/phase7/selection.json), and [multi-label category counts](results/error_analysis/phase7/category_counts.json).
+
+Only original saved final-test predictions from representative MLP seed **202** were used, at its locked validation threshold **0.3784696161746979**. The ID join verifies source and label alignment across all 3,000 test examples. Available errors agree with the saved confusion matrix `[[1423,77],[105,1395]]`: **77 false positives** and **105 false negatives**. Selection takes the 10 FPs with highest scores and 10 FNs with lowest scores, breaking ties by ascending `example_id`. These are extreme model scores, not calibrated probabilities or proven confidence.
+
+One analyst (the implementing assistant) read every selected question, answer and full provided context. Supported copied answers were sometimes rejected; date/entity mismatches were sometimes accepted. Two cases suggest label anomalies (one conditional on an ambiguous company referent), and several require unresolved attribution, naming or geographic evidence. The review distinguishes apparent model errors, label anomalies and unclear judgments without changing labels. Long supported FPs and short erroneous FNs are consistent with existing shortcut concerns, but the cases do not establish a causal feature mechanism. No chunk-selection failure is claimed. Deliberate extreme-score selection and a single analyst make these descriptive findings unsuitable as population estimates.
+
+Reproduce selection and export from existing local processed test data and saved Phase 5/6 artifacts:
+
+```powershell
+.venv\Scripts\python.exe scripts/run_phase7.py
+```
+
+Reusable logic is in `src/hallucination_detector/error_analysis.py`; the thin command joins fixed predictions, checks saved decisions/provenance, and attaches the explicitly authored [analyst notes](results/error_analysis/phase7/analyst_notes.json). It validates verbatim excerpts and exact review coverage, then regenerates only Phase 7 exports. Full contexts and the complete test dataset are not exported. Qualitative judgments are preserved analyst work, not automatically inferred categories. No inference, retraining, retuning or new experiment occurs. Phase 6 artifact preservation is recorded in [the byte-check manifest](results/error_analysis/phase7/artifact_preservation.json). Phase 8 has not been implemented.
 
 Reproduction instructions
 ------------------------
@@ -309,7 +321,7 @@ Artifacts:
 
 ![Phase 5 training and validation loss curves](results/figures/phase5_losses.png)
 
-The existing encoder metadata records its revision as unavailable (`null`); Phase 5 preserves that limitation and does not reload the encoder. The run also emitted a nonfatal Matplotlib font-cache permission warning; the loss figure was generated successfully. Phase 5 itself stops at validation. Phase 6 final test and shuffled-context outputs are documented above; qualitative error analysis remains future work.
+The existing encoder metadata records its revision as unavailable (`null`); Phase 5 preserves that limitation and does not reload the encoder. The run also emitted a nonfatal Matplotlib font-cache permission warning; the loss figure was generated successfully. Phase 5 itself stops at validation. Phase 6 final test and shuffled-context outputs and Phase 7 qualitative error analysis are documented above.
 
 Repository structure
 --------------------
@@ -322,7 +334,7 @@ See PROJECT_PLAN.md for the recommended structure. Key folders:
 
 Limitations
 -----------
-These results apply to paired HaluEval-QA with a balanced, duplicate-context-grouped split. They do not establish reliable grounding detection for arbitrary LLM answers, unseen domains, different generation styles, real-world class distributions or deployment. The threshold, linear and nonlinear primary approaches all use frozen neural sentence embeddings. The near-matching answer-only negative control and high shuffled-context ROC-AUC suggest substantial benchmark shortcuts; strong benchmark scores cannot be attributed solely to contextual grounding. Chunk selection may miss relevant evidence, and the frozen 384-dimensional representation has limited factual resolution. Three-seed sample SD describes run variation only. No clean-environment reproduction or Phase 7 qualitative error review has yet been performed; these remain outside this Phase 6 completion. The encoder revision was not available in the inherited metadata.
+These results apply to paired HaluEval-QA with a balanced, duplicate-context-grouped split. They do not establish reliable grounding detection for arbitrary LLM answers, unseen domains, different generation styles, real-world class distributions or deployment. The threshold, linear and nonlinear primary approaches all use frozen neural sentence embeddings. The near-matching answer-only negative control and high shuffled-context ROC-AUC suggest substantial benchmark shortcuts; strong benchmark scores cannot be attributed solely to contextual grounding. Chunk selection may miss relevant evidence, and the frozen 384-dimensional representation has limited factual resolution; Phase 7 does not demonstrate any chunk-selection failure. Three-seed sample SD describes run variation only. Phase 7 reviews deliberately selected extreme-score errors with one analyst; clean-environment reproduction remains Phase 8 work. The encoder revision was not available in the inherited metadata.
 
 References
 ----------
