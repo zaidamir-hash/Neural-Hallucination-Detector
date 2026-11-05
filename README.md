@@ -45,15 +45,112 @@ Primary metric: F1 for the hallucinated class (label = 1). Test set is locked du
 
 Results
 -------
-TBD
+Phase 6 locked final test evaluation and shuffled-context analysis
+-----------------------------------------------------------------
+The single planned final evaluation completed on 3,000 examples from 1,500 test sources: 1,500 Grounded (`0`) and 1,500 Hallucinated (`1`). Every model used the identical example order. These are final test results; the Phase 4/5 tables below remain explicitly labeled validation selection-set results. No fitting, retuning, checkpoint selection, threshold adjustment, or representative-seed replacement occurred.
+
+Before opening test inputs, the evaluator saved [the evaluation manifest](results/metrics/phase6/evaluation_manifest.json) with dataset/source, split-manifest, feature schema, preprocessing and scaler identities; Phase 4/5 reports and checkpoint checksums; fixed model choices and thresholds; seeds; and metric definitions. All 154 offline synthetic tests passed before the real evaluation. [The development smoke check](results/metrics/phase6/development_smoke.json) exactly reproduced every saved validation metric with no test inputs opened. The dedicated Phase 6 loader preserves the Phase 4/5 test-access guards. It checks IDs, paired variants, labels, class counts, stable source identities, split/context provenance, schema and scaler compatibility. Original test features were reconstructed exactly from compatible frozen caches before inference.
+
+All threshold decisions come from validation artifacts: cosine direction **higher**, signed-score threshold `0.2736169099807739`; primary LR `C=0.01`, threshold `0.48363664746284485`; answer-only control `C=0.01`, threshold `0.46458989417782254`; MLP thresholds `0.512878954410553` (101), `0.3784696161746979` (202), and `0.5508548617362976` (303). Every prediction uses `score >= threshold`. ROC-AUC uses continuous hallucination scores: signed similarity for cosine and positive-class probabilities for LR/control/MLP. Precision, recall and F1 use Hallucinated as the positive class, with zero-division results set to zero.
+
+| Approach (final test) | Accuracy | Precision (1) | Recall (1) | F1 (1) | ROC-AUC |
+|---|---:|---:|---:|---:|---:|
+| Cosine | 0.649333 | 0.596386 | 0.924000 | 0.724895 | 0.746504 |
+| Primary Logistic Regression | 0.948000 | 0.949198 | 0.946667 | 0.947931 | 0.985544 |
+| MLP seed 101 | 0.939667 | 0.948945 | 0.929333 | 0.939037 | 0.983103 |
+| MLP seed 202 (representative) | 0.939333 | 0.947690 | 0.930000 | 0.938762 | 0.983063 |
+| MLP seed 303 | 0.939333 | 0.951370 | 0.926000 | 0.938514 | 0.982918 |
+| MLP three-seed mean | 0.939444 | 0.949335 | 0.928444 | 0.938771 | 0.983028 |
+| MLP sample SD (ddof=1) | 0.000192 | 0.001871 | 0.002143 | 0.000262 | 0.000097 |
+
+Separate answer-only style/length diagnostic:
+
+| Accuracy | Precision (1) | Recall (1) | F1 (1) | ROC-AUC |
+|---:|---:|---:|---:|---:|
+| 0.947333 | 0.947333 | 0.947333 | 0.947333 | 0.974362 |
+
+Seed **202** remains the representative run selected by median validation F1. Its metrics are a single run, separate from the three-seed mean and sample SD (`ddof=1`). Seed SD measures variation across these three training runs, not uncertainty over the benchmark population. The MLP did not outperform primary LR on final test F1 or ROC-AUC. The negative control is a separate answer-only style/length diagnostic and is not one of the three primary approaches.
+
+Confusion matrices are `[[TN, FP], [FN, TP]]` (rows=true, columns=predicted; labels `[0,1]`):
+
+| Model | Final test confusion matrix |
+|---|---|
+| Cosine | `[[562, 938], [114, 1386]]` |
+| Primary Logistic Regression | `[[1424, 76], [80, 1420]]` |
+| MLP seed 101 | `[[1425, 75], [106, 1394]]` |
+| MLP seed 202 | `[[1423, 77], [105, 1395]]` |
+| MLP seed 303 | `[[1429, 71], [111, 1389]]` |
+| Answer-only negative control (separate diagnostic) | `[[1421, 79], [79, 1421]]` |
+
+![Final test confusion matrices, including all MLP seeds and the separate negative control](results/figures/phase6/confusion_matrices.png)
+
+![Final test ROC curves; representative MLP seed 202 and separate control panel](results/figures/phase6/roc.png)
+
+![Final test precision-recall curves; representative MLP seed 202 and separate control panel](results/figures/phase6/precision_recall.png)
+
+The existing [training/validation loss curves](results/figures/phase5_losses.png) remain unchanged.
+
+Shuffled-context sanity results (fixed models)
+---------------------------------------------
+The evaluator saved primary metrics, predictions, comparison and plots, then wrote [their checksums](results/metrics/phase6/primary_saved.json) **before** generating the shuffle. The sole prespecified seed was **42**. The deterministic one-to-one mapping covers 1,500 sources with 1,490 normalized contexts (largest duplicate-context group: 2). It keeps normalized-context groups contiguous in a seeded order and rotates donor assignments by the largest group size. It fails if a context group exceeds half the sources, when this exclusion-constrained bijection is impossible. It never searches shuffles using model scores.
+
+All integrity checks passed: no source keeps its own context; no replacement has the same normalized context, including duplicate-context matches; both answers receive the same donor context; donor IDs form a bijection; questions, answers, labels, IDs and row order stay unchanged; question-answer interactions and answer-only scalar features stay bitwise unchanged; the training scaler remains unchanged. The saved [mapping and checks](results/metrics/phase6/shuffled_context_mapping.json) contain identifiers only, without raw text.
+
+Frozen cached question/answer embeddings and context chunks were reused without running or modifying the encoder. Existing Phase 3 utilities rebuilt every context-dependent feature, including answer-relevant chunk selection, four-block feature construction, maximum and top-three similarities, question-context similarity, content coverage and numeric coverage. The original training scaler and all model thresholds were applied unchanged. Only cosine, primary LR and representative MLP seed 202 were evaluated under the shuffle.
+
+| Model / condition | Accuracy | Precision (1) | Recall (1) | F1 (1) | ROC-AUC |
+|---|---:|---:|---:|---:|---:|
+| Cosine / Original | 0.649333 | 0.596386 | 0.924000 | 0.724895 | 0.746504 |
+| Cosine / Shuffled | 0.501333 | 0.535714 | 0.020000 | 0.038560 | 0.465869 |
+| Cosine / Delta (shuffled minus original) | -0.148000 | -0.060671 | -0.904000 | -0.686335 | -0.280636 |
+| Primary Logistic Regression / Original | 0.948000 | 0.949198 | 0.946667 | 0.947931 | 0.985544 |
+| Primary Logistic Regression / Shuffled | 0.643333 | 0.584913 | 0.987333 | 0.734623 | 0.949069 |
+| Primary Logistic Regression / Delta (shuffled minus original) | -0.304667 | -0.364285 | +0.040667 | -0.213308 | -0.036475 |
+| MLP seed 202 (representative) / Original | 0.939333 | 0.947690 | 0.930000 | 0.938762 | 0.983063 |
+| MLP seed 202 (representative) / Shuffled | 0.686333 | 0.616701 | 0.984667 | 0.758408 | 0.956576 |
+| MLP seed 202 (representative) / Delta (shuffled minus original) | -0.253000 | -0.330989 | +0.054667 | -0.180354 | -0.026487 |
+
+| Fixed model | Original confusion matrix | Shuffled confusion matrix |
+|---|---|---|
+| Cosine | `[[562, 938], [114, 1386]]` | `[[1474, 26], [1470, 30]]` |
+| Primary Logistic Regression | `[[1424, 76], [80, 1420]]` | `[[449, 1051], [19, 1481]]` |
+| MLP seed 202 (representative) | `[[1423, 77], [105, 1395]]` | `[[582, 918], [23, 1477]]` |
+
+All three models lost F1 under this fixed shuffle. LR and the representative MLP gained recall while losing substantial precision at unchanged thresholds; their ROC-AUC remained high (`0.949069` and `0.956576`) despite unrelated contexts. This indicates sensitivity of their decisions to context replacement, while substantial ranking information remains in the unchanged question/answer inputs and benchmark artifacts. It does not establish that learned grounding caused their original performance, or identify a single causal shortcut. The strong answer-only control (test F1 `0.947333`) and documented length/style differences are serious concerns. Shuffling is a distribution shift and one prespecified sanity analysis, not a proof of real-world factual verification or a basis for model selection. The negative control was not rerun because its answer-only inputs are unchanged.
+
+Phase 6 artifacts and reproduction
+----------------------------------
+Reusable inference/locking logic is in `src/hallucination_detector/evaluation.py`; orchestration and plots in `evaluation_pipeline.py`; cached feature recomputation and context mapping in `context_sanity.py`. The entry-point script is thin. Existing Phase 3/4/5 loaders, feature builders, scalers, metric utilities, checkpoints and reports are reused without changing their behavior.
+
+From the repository root, after reproducing Phases 1–5 with the commands below:
+
+```powershell
+.venv\Scripts\python.exe -m pytest tests -q
+.venv\Scripts\python.exe scripts/run_phase6.py --prepare
+.venv\Scripts\python.exe scripts/run_phase6.py --evaluate
+git diff --check
+```
+
+The runner intentionally refuses to overwrite an existing lock or repeat an evaluation attempt. For independent reproduction, use a separate checkout with its own data and checkpoints; preserve the tracked `results/metrics/phase6` and `results/figures/phase6` directories in a reference folder before these commands. Do not remove or replace this recorded evaluation for development. Reproduction uses the saved validation decisions and training artifacts, with CPU inference, one PyTorch thread, one BLAS thread and batch size 128. The ignored data caches, scaler and checkpoints must be acquired/reproduced locally; they are not bundled with Git.
+
+Phase 6 outputs prepared for review (not yet committed):
+
+- [Evaluation manifest](results/metrics/phase6/evaluation_manifest.json), [pre-test validation smoke](results/metrics/phase6/development_smoke.json), and [execution record](results/metrics/phase6/execution.json).
+- [Final metrics and three-seed summary](results/metrics/phase6/primary_metrics.json), [comparison table](results/metrics/phase6/comparison.md), and [primary output checksums saved before shuffle](results/metrics/phase6/primary_saved.json).
+- [Final predictions](results/metrics/phase6/primary_predictions.csv): 18,000 rows across six fixed runs. Columns: `example_id`, `source_id`, `true_label`, `continuous_score`, `predicted_label`, `model`, `seed` (blank when not applicable). No raw text is included.
+- [Shuffled results with all original/shuffled metrics and deltas](results/metrics/phase6/shuffled_metrics.json), [source-to-donor mapping](results/metrics/phase6/shuffled_context_mapping.json), and [shuffled predictions](results/metrics/phase6/shuffled_predictions.csv): 9,000 rows across three fixed models.
+- The three figures above; all were visually inspected. Seed 202 predictions are the handoff for later qualitative analysis; no Phase 7 errors were reviewed here.
+
+Verification: the original suite passed 130 tests; the completed suite passed **154 tests** before final evaluation, with no skips. `git diff --check` passed. Exactly **one** real final evaluation and one fixed shuffled evaluation were performed, with **no reruns or implementation defects requiring reevaluation**. Matplotlib emitted a nonfatal permission warning while saving its font cache outside the repository; all requested figures were generated successfully. The existing unavailable (`null`) encoder revision remains a provenance limitation. Source, checkpoint, input and output checksums are preserved. No calibration, extra ablations, demo, deployment or Phase 7 analysis was added.
+
 
 Qualitative error analysis
 --------------------------
-TBD
+Not started (Phase 7, outside the authorized Phase 6 scope). Representative seed 202 predictions and IDs are preserved for the handoff; no high-confidence error review has been performed.
 
 Reproduction instructions
 ------------------------
-See configs/default.yaml for the canonical configuration, and tests/ for Phase 0–5 validation checks.
+See configs/default.yaml for the canonical configuration, and tests/ for Phase 0–6 validation checks.
 
 Environment setup
 -----------------
@@ -212,7 +309,7 @@ Artifacts:
 
 ![Phase 5 training and validation loss curves](results/figures/phase5_losses.png)
 
-The existing encoder metadata records its revision as unavailable (`null`); Phase 5 preserves that limitation and does not reload the encoder. The run also emitted a nonfatal Matplotlib font-cache permission warning; the loss figure was generated successfully. Phase 5 stops at validation: final test evaluation, shuffled-context analysis, and qualitative error analysis remain future phases.
+The existing encoder metadata records its revision as unavailable (`null`); Phase 5 preserves that limitation and does not reload the encoder. The run also emitted a nonfatal Matplotlib font-cache permission warning; the loss figure was generated successfully. Phase 5 itself stops at validation. Phase 6 final test and shuffled-context outputs are documented above; qualitative error analysis remains future work.
 
 Repository structure
 --------------------
@@ -225,7 +322,7 @@ See PROJECT_PLAN.md for the recommended structure. Key folders:
 
 Limitations
 -----------
-TBD
+These results apply to paired HaluEval-QA with a balanced, duplicate-context-grouped split. They do not establish reliable grounding detection for arbitrary LLM answers, unseen domains, different generation styles, real-world class distributions or deployment. The threshold, linear and nonlinear primary approaches all use frozen neural sentence embeddings. The near-matching answer-only negative control and high shuffled-context ROC-AUC suggest substantial benchmark shortcuts; strong benchmark scores cannot be attributed solely to contextual grounding. Chunk selection may miss relevant evidence, and the frozen 384-dimensional representation has limited factual resolution. Three-seed sample SD describes run variation only. No clean-environment reproduction or Phase 7 qualitative error review has yet been performed; these remain outside this Phase 6 completion. The encoder revision was not available in the inherited metadata.
 
 References
 ----------

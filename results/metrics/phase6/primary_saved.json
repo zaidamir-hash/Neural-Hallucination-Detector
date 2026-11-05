@@ -1,0 +1,12 @@
+{
+  "primary_saved_utc": "2026-11-05T12:14:38.075424+00:00",
+  "before_shuffled_context_analysis": true,
+  "output_checksums": {
+    "results/metrics/phase6/primary_metrics.json": "2f74cd501cd1861e6d7475ad871018e7eaaff507d556452ab7a7523584a1669f",
+    "results/metrics/phase6/primary_predictions.csv": "f77801113b3e94b45181a4a5c1edb779f875476321b7bf7a8b4bb5b1d75b6040",
+    "results/metrics/phase6/comparison.md": "7c73c719ea69943abbf3538e4b5ac2e5add16a123107d6c76db26346b040ea64",
+    "results/figures/phase6/confusion_matrices.png": "ec175ff2147186992d4dadaedb018540b651a6e95d2192b00e6b316acf53cda8",
+    "results/figures/phase6/roc.png": "57cc4427b5229b9838b65d4abcbc95b3281d15c4064372455c173e2495f6b385",
+    "results/figures/phase6/precision_recall.png": "28c76e56dbd04472e6ebd4aa49f447f9d43624479974ff62c54f6af6eea51f7d"
+  }
+}

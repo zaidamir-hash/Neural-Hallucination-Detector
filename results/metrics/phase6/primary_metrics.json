@@ -1,0 +1,245 @@
+{
+  "phase": 6,
+  "split": "test",
+  "evaluation_manifest_checksum": "916936b61f60843b55e9a82be208d54c64f938cfdc8a9054e01aaa4b7a28d4b1",
+  "row_count": 3000,
+  "source_count": 1500,
+  "label_counts": {
+    "0": 1500,
+    "1": 1500
+  },
+  "input_checksums": {
+    "data/embedding_cache/cache_metadata_answers.json": "99ba4586be65f2517903ef9c0d9a1d48940c1f7148c3c16d70c50fb5ef59106d",
+    "data/embedding_cache/cache_metadata_chunks.json": "183f9dacb7b63da586e9782c7c7d5bbf299c169066d25ed060717a61a2afe614",
+    "data/embedding_cache/cache_metadata_contexts.json": "3094d4e402446f5740fc4428c2a9d766b9c6ebfb0801bdd350ebd16a0e9562f8",
+    "data/embedding_cache/cache_metadata_questions.json": "3044e09712ee6b2c156d576f46bdb2aaa77cd30fbfe0d22e7d6f3598d9c4e808",
+    "data/embedding_cache/chunk_offsets.npy": "9e5a92e85b7bf2c31047e9eb9a3df37da4276b53a3d22024697d9eee277abdb3",
+    "data/embedding_cache/embedding_ids_answers.json": "5868ce467bed75edf8cec54dac69ffdadf8088fbb1c8777e6bbcc51985706540",
+    "data/embedding_cache/embedding_ids_chunks.json": "142f1ddb536be58ea24c2cfa9f51d9097c72f3bf76ed6312d6eaebf78b919e77",
+    "data/embedding_cache/embedding_ids_contexts.json": "142f1ddb536be58ea24c2cfa9f51d9097c72f3bf76ed6312d6eaebf78b919e77",
+    "data/embedding_cache/embedding_ids_questions.json": "1452dcb67da5bb8e03c2a42910394b1723c062c3d6ae53b1bb534af012811173",
+    "data/embedding_cache/embeddings_answers.npy": "98a2d46e68894246801459a90c915c9a536e29e7db437eb2f333ba57b458d4c8",
+    "data/embedding_cache/embeddings_chunks.npy": "0627277e907c61800099fddf6a68e3a1f2574cacbb35fcc152d473ae83538e77",
+    "data/embedding_cache/embeddings_contexts.npy": "ed02b77092ee43be69eacc5b8a440dd6ccedd0c3ad23ec22c1dd92b650725650",
+    "data/embedding_cache/embeddings_questions.npy": "fcbf6a81a1caa08f00cfaead18dcb3196973bc9d39723ba96429d84f51bfc460",
+    "data/features/test/example_ids.json": "0eac20572289eab610caf10c5afc533c36fb8062cdee4ad15e5b0645a425f3b1",
+    "data/features/test/features.npy": "a0020aef70eefd9b433d45c01f8075e1fd27e4ad9c5feb65095f82800a306645",
+    "data/features/test/features_scaled.npy": "7554c3bd896ae5871e731c8286f3564dc7d80c5edeee194966b344bdc7701df7",
+    "data/features/test/labels.npy": "654c245e2258f261cb1d565d0c8da9ef8de385481890321d51e6b2938e66627e",
+    "data/features/test/metadata.json": "4c9c9f4506164d07a8fa00d5ad57b008cfe57aea3dc2441ff11991a20a94bf8c",
+    "data/features/test/source_ids.json": "0467f65e3cc562f12cd030ceddafac1b099908042d3a1d4949947f4f45da5974",
+    "data/processed/halueval_expanded_test.jsonl": "fcb184f045a67339db23f7197f8bc898c6494ef823e6c74b0ecc151c6186c526"
+  },
+  "feature_reconstruction_exact": true,
+  "results": [
+    {
+      "model": "cosine",
+      "seed": null,
+      "threshold": 0.2736169099807739,
+      "metrics": {
+        "accuracy": 0.6493333333333333,
+        "precision": 0.5963855421686747,
+        "recall": 0.924,
+        "f1": 0.7248953974895398,
+        "roc_auc": 0.7465044444444444,
+        "confusion_matrix": [
+          [
+            562,
+            938
+          ],
+          [
+            114,
+            1386
+          ]
+        ]
+      }
+    },
+    {
+      "model": "primary_logistic",
+      "seed": null,
+      "threshold": 0.48363664746284485,
+      "metrics": {
+        "accuracy": 0.948,
+        "precision": 0.9491978609625669,
+        "recall": 0.9466666666666667,
+        "f1": 0.9479305740987984,
+        "roc_auc": 0.9855435555555556,
+        "confusion_matrix": [
+          [
+            1424,
+            76
+          ],
+          [
+            80,
+            1420
+          ]
+        ]
+      }
+    },
+    {
+      "model": "mlp",
+      "seed": 101,
+      "threshold": 0.512878954410553,
+      "metrics": {
+        "accuracy": 0.9396666666666667,
+        "precision": 0.9489448604492853,
+        "recall": 0.9293333333333333,
+        "f1": 0.939036712697878,
+        "roc_auc": 0.9831031111111111,
+        "confusion_matrix": [
+          [
+            1425,
+            75
+          ],
+          [
+            106,
+            1394
+          ]
+        ]
+      }
+    },
+    {
+      "model": "mlp",
+      "seed": 202,
+      "threshold": 0.3784696161746979,
+      "metrics": {
+        "accuracy": 0.9393333333333334,
+        "precision": 0.9476902173913043,
+        "recall": 0.93,
+        "f1": 0.9387617765814267,
+        "roc_auc": 0.9830626666666668,
+        "confusion_matrix": [
+          [
+            1423,
+            77
+          ],
+          [
+            105,
+            1395
+          ]
+        ]
+      }
+    },
+    {
+      "model": "mlp",
+      "seed": 303,
+      "threshold": 0.5508548617362976,
+      "metrics": {
+        "accuracy": 0.9393333333333334,
+        "precision": 0.9513698630136986,
+        "recall": 0.926,
+        "f1": 0.9385135135135135,
+        "roc_auc": 0.9829182222222222,
+        "confusion_matrix": [
+          [
+            1429,
+            71
+          ],
+          [
+            111,
+            1389
+          ]
+        ]
+      }
+    },
+    {
+      "model": "negative_control",
+      "seed": null,
+      "threshold": 0.46458989417782254,
+      "metrics": {
+        "accuracy": 0.9473333333333334,
+        "precision": 0.9473333333333334,
+        "recall": 0.9473333333333334,
+        "f1": 0.9473333333333334,
+        "roc_auc": 0.9743624444444445,
+        "confusion_matrix": [
+          [
+            1421,
+            79
+          ],
+          [
+            79,
+            1421
+          ]
+        ]
+      }
+    }
+  ],
+  "mlp_three_seed_summary": {
+    "seeds": [
+      101,
+      202,
+      303
+    ],
+    "ddof": 1,
+    "metrics": {
+      "accuracy": {
+        "mean": 0.9394444444444444,
+        "sample_sd": 0.00019245008972985407
+      },
+      "precision": {
+        "mean": 0.9493349802847627,
+        "sample_sd": 0.0018705862960917176
+      },
+      "recall": {
+        "mean": 0.9284444444444445,
+        "sample_sd": 0.0021430335024428732
+      },
+      "f1": {
+        "mean": 0.9387706675976061,
+        "sample_sd": 0.00026171288515555697
+      },
+      "roc_auc": {
+        "mean": 0.983028,
+        "sample_sd": 9.719726663841036e-05
+      },
+      "confusion_matrix": {
+        "mean": [
+          [
+            1425.6666666666667,
+            74.33333333333333
+          ],
+          [
+            107.33333333333333,
+            1392.6666666666667
+          ]
+        ],
+        "sample_sd": [
+          [
+            3.0550504633038935,
+            3.055050463303893
+          ],
+          [
+            3.214550253664318,
+            3.2145502536643185
+          ]
+        ]
+      }
+    }
+  },
+  "representative_mlp_seed": 202,
+  "metric_definitions": {
+    "positive_class": "1=Hallucinated; 0=Grounded",
+    "prediction": "score >= fixed threshold",
+    "accuracy": "(TN+TP)/N",
+    "precision": "TP/(TP+FP)",
+    "recall": "TP/(TP+FN)",
+    "f1": "2TP/(2TP+FP+FN); primary metric",
+    "zero_division": 0,
+    "roc_auc": "sklearn ROC-AUC from continuous hallucination scores; never predicted labels",
+    "confusion_matrix": "[[TN, FP], [FN, TP]]",
+    "mlp_sd_ddof": 1
+  },
+  "negative_control_role": "Separate answer-only diagnostic, not a primary model",
+  "qualitative_handoff": {
+    "model": "mlp",
+    "seed": 202,
+    "predictions": "results/metrics/phase6/primary_predictions.csv",
+    "analysis_performed": false
+  },
+  "figures": [
+    "results/figures/phase6/confusion_matrices.png",
+    "results/figures/phase6/roc.png",
+    "results/figures/phase6/precision_recall.png"
+  ]
+}
