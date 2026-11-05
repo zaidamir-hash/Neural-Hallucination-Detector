@@ -41,7 +41,10 @@ data/processed/
 # (Individual large artifacts derived from splits may be ignored separately.)
 
 
-# Embedding caches
+# Generated Phase 3 artifacts
+data/embedding_cache/
+data/features/
+data/scaler/
 embeddings_cache/
 *.embeddings.npy
 

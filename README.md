@@ -53,7 +53,13 @@ TBD
 
 Reproduction instructions
 ------------------------
-See configs/default.yaml for the canonical configuration, and tests/ for Phase 0 and Phase 1 validation checks.
+See configs/default.yaml for the canonical configuration, and tests/ for Phase 0, 1, 2, and 3 validation checks.
+
+Environment setup
+-----------------
+- Python 3.12.0 (dedicated .venv at project root)
+- Install: `pip install -r requirements.txt`
+- Key packages: torch 2.14.0+cpu, sentence-transformers 6.0.1, scikit-learn 1.9.0
 
 Phase 1 commands (data acquisition & audit)
 ------------------------------------------
@@ -65,6 +71,50 @@ Phase 1 commands (data acquisition & audit)
   - python scripts/audit_halueval.py
 - Run duplicate audit:
   - python scripts/duplicate_audit.py
+
+Phase 2 commands (leakage-safe splitting)
+-----------------------------------------
+- Create the original-record split manifest:
+  - python scripts/create_split_manifest.py
+- Expand records only after split assignment:
+  - python scripts/expand_split_records.py
+- Validate leakage and pairing invariants:
+  - python scripts/validate_split_leakage.py
+
+Phase 3 commands (frozen embeddings & features)
+----------------------------------------------
+- Run the full Phase 3 pipeline (encoding, chunking, feature generation, scaling):
+  - python scripts/run_phase3.py
+- Explicitly replace incompatible or stale embedding caches:
+  - python scripts/run_phase3.py --force-recompute
+
+Phase 3 methodology
+-------------------
+- Encoder: sentence-transformers/all-MiniLM-L6-v2 (frozen, 384-d, L2-normalized)
+- Context chunking: 192 model tokens per chunk, 32-token overlap, tokenizer-aware
+- Primary feature vector (dim=1,543):
+  - 4 interaction blocks (384 each): |a - c_a|, a * c_a, |q - a|, q * a
+  - 7 scalar features: max answer-context cosine, mean top-3 answer-context cosine, question-answer cosine, max question-context cosine, answer content-token coverage, answer numeric-token coverage, numeric-token presence
+- Scaling: StandardScaler fit on training data only, applied to all splits
+
+Phase 3 artifacts
+-----------------
+- data/features/{train,validation,test}/features.npy — raw features (N, 1543)
+- data/features/{train,validation,test}/features_scaled.npy — scaled features (N, 1543)
+- data/features/{train,validation,test}/labels.npy — binary labels
+- data/features/{train,validation,test}/example_ids.json — stable example IDs
+- data/features/{train,validation,test}/source_ids.json — source record IDs
+- data/features/{train,validation,test}/metadata.json — per-split stats
+- data/features/schema.json — feature schema with block boundaries and scalar indices
+- data/scaler/scaler.npz — fitted scaler parameters (mean, scale)
+- data/embedding_cache/ — compatible question, answer, context, and chunk embeddings with metadata
+
+Phase 3 cache policy
+--------------------
+- Compatible embedding caches are validated and reused.
+- Incomplete or incompatible caches fail clearly instead of being silently mixed or replaced.
+- `--force-recompute` explicitly refreshes all embedding caches.
+- Embedding caches, feature matrices, fitted scaler artifacts, and `.venv` are excluded from Git.
 
 Provenance location
 -------------------
@@ -85,11 +135,7 @@ Preliminary text-level audit (no embeddings) shows noticeable differences betwee
 - Grounded answers are typically short (token mean ≈ 2.22, median 2), with high lexical overlap with the context (mean lexical coverage ≈ 0.897).
 - Hallucinated answers are longer on average (token mean ≈ 10.99, median 9) and have lower lexical overlap with the context (mean lexical coverage ≈ 0.628).
 
-These observations suggest potential shortcut risks based on answer length and lexical overlap. Embedding-based similarity checks are deferred to Phase 3.
-
-Repository structure
---------------------
-(unchanged) See PROJECT_PLAN.md for the recommended structure. Key folders include configs/, data/, src/, results/, and tests/.
+These observations suggest potential shortcut risks based on answer length and lexical overlap. Phase 3 now supplies the frozen-embedding similarity features used by the primary models.
 
 Repository structure
 --------------------

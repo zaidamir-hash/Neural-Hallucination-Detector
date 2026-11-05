@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0.0",
+  "total_dim": 1543,
+  "interaction_blocks": {
+    "count": 4,
+    "dim_each": 384,
+    "vector_dim": 1536,
+    "order": [
+      {"index": 0, "name": "|a - c_a|", "start": 0, "end": 384},
+      {"index": 1, "name": "a * c_a", "start": 384, "end": 768},
+      {"index": 2, "name": "|q - a|", "start": 768, "end": 1152},
+      {"index": 3, "name": "q * a", "start": 1152, "end": 1536}
+    ]
+  },
+  "scalar_features": {
+    "count": 7,
+    "start": 1536,
+    "order": [
+      {"index": 0, "name": "max_answer_context_cosine", "dim_index": 1536},
+      {"index": 1, "name": "mean_top3_answer_context_cosine", "dim_index": 1537},
+      {"index": 2, "name": "question_answer_cosine", "dim_index": 1538},
+      {"index": 3, "name": "max_question_context_cosine", "dim_index": 1539},
+      {"index": 4, "name": "answer_content_token_coverage", "dim_index": 1540},
+      {"index": 5, "name": "answer_numeric_token_coverage", "dim_index": 1541},
+      {"index": 6, "name": "answer_has_numeric_token", "dim_index": 1542}
+    ]
+  },
+  "encoder": {
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "embedding_dim": 384,
+    "normalized": true
+  },
+  "context_chunking": {
+    "max_chunk_tokens": 192,
+    "chunk_overlap_tokens": 32
+  },
+  "notes": [
+    "Primary feature vector = 4 * 384 + 7 = 1543",
+    "Encoder remains frozen. No fine-tuning.",
+    "Features are L2-normalized embeddings; cosine = dot product.",
+    "Scalar features #5-#7 use lightweight punctuation-stripped token matching.",
+    "Scaling: StandardScaler fit on training data only."
+  ]
+}
