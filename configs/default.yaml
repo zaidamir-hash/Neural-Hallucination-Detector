@@ -46,11 +46,19 @@ mlp:
     - 0.10
   loss: BCEWithLogitsLoss
   optimizer: AdamW
-  learning_rate: 1e-3
-  weight_decay: 1e-4
+  learning_rate: 0.001
+  weight_decay: 0.0001
   batch_size: 128
   max_epochs: 30
   early_stopping_patience: 5
+
+phase5:
+  device: cpu
+  torch_threads: 1
+  checkpoint_dir: checkpoints/phase5
+  history_dir: results/metrics/phase5
+  report_path: results/metrics/phase5_validation.json
+  figure_path: results/figures/phase5_losses.png
 
 training:
   primary_metric: hallucinated_f1

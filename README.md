@@ -53,7 +53,7 @@ TBD
 
 Reproduction instructions
 ------------------------
-See configs/default.yaml for the canonical configuration, and tests/ for Phase 0–4 validation checks.
+See configs/default.yaml for the canonical configuration, and tests/ for Phase 0–5 validation checks.
 
 Environment setup
 -----------------
@@ -173,6 +173,46 @@ All eight Logistic Regression candidate fits converged. Primary iterations for C
 The strong answer-only result, together with the large answer-length difference (Phase 1 token means approximately 2.22 versus 10.99), is a serious benchmark shortcut concern. High validation performance cannot be attributed solely to context grounding. These results do not establish real-world hallucination detection or a final model ranking.
 
 Tracked configuration, complete C searches, cosine direction search, validation metrics/confusion matrices, control feature schema/scaler parameters, library versions, and input provenance are in `results/metrics/phase4_validation.json`. Fitted estimators, both scaler parameter sets, and selected rules are saved without raw text in ignored `checkpoints/phase4/baselines.joblib`. Only trusted local joblib checkpoints should be loaded; the loader checks feature schema and preprocessing compatibility. No final test evaluation, MLP, shuffled-context evaluation, or error analysis has been run in Phase 4.
+
+Phase 5 MLP training (validation only)
+-------------------------------------
+From the repository root, with the existing Phase 3 artifacts and Phase 4 validation report:
+
+```powershell
+.venv\Scripts\python.exe scripts/run_phase5.py
+.venv\Scripts\python.exe -m pytest tests -q
+```
+
+The runner uses only the saved training-scaled 1,543-dimensional training and validation matrices (14,000 and 3,000 examples). Before training, it verifies the canonical schema, preprocessing version, dataset/source and split provenance, embedding metadata, IDs and labels, and unchanged Phase 4 input checksums. Phase 4 already verified the scaler against training moments; Phase 5 checks its identity and verifies both saved scaled matrices against its transformation. It never fits another scaler, regenerates embeddings, or opens test features/labels.
+
+The locked network is `1543 -> Linear(256) -> ReLU -> Dropout(0.20) -> Linear(64) -> ReLU -> Dropout(0.10) -> Linear(1)`, returning raw logits. Training uses unweighted BCEWithLogitsLoss, AdamW, numeric learning rate `0.001`, weight decay `0.0001`, batch size 128, maximum 30 epochs, and patience 5. Both epoch losses are weighted by batch sample counts, including incomplete final batches. Validation uses evaluation/inference mode. Strictly lower validation loss saves the best checkpoint; equal losses retain the earlier epoch. Each run restores that checkpoint before sigmoid prediction and validation-only F1 threshold selection using the existing Phase 4 utility and tie rules.
+
+The three runs seed Python, NumPy, PyTorch, and an independent training DataLoader generator. Only training batches shuffle. This execution used CPU, one PyTorch compute thread, no loader workers, deterministic algorithms enabled, cuDNN deterministic enabled and benchmark disabled. Exact library versions, execution settings, code hashes, and input hashes are recorded in the summary. Reproducibility applies to the same software/hardware settings; bitwise identity across platforms is not guaranteed.
+
+**Validation selection-set results, not final test estimates:**
+
+| Seed | Accuracy | Precision (1) | Recall (1) | F1 (1) | ROC-AUC | Threshold | Best epoch |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 101 | 0.940000 | 0.937666 | 0.942667 | 0.940160 | 0.984600 | 0.512878954410553 | 2 |
+| 202 | 0.940333 | 0.941216 | 0.939333 | 0.940274 | 0.984942 | 0.3784696161746979 | 2 |
+| 303 | 0.943667 | 0.944556 | 0.942667 | 0.943610 | 0.984750 | 0.5508548617362976 | 2 |
+| Mean | 0.941333 | 0.941146 | 0.941556 | 0.941348 | 0.984764 | — | — |
+| Sample SD | 0.002028 | 0.003446 | 0.001925 | 0.001960 | 0.000171 | — | — |
+
+Standard deviations use `ddof=1` across the three seeds. All three stopped after epoch 7, following five epochs without improvement after epoch 2. Best validation BCE losses were 0.1642051882, 0.1608461339, and 0.1676170768 for seeds 101, 202, and 303, respectively. Confusion matrices (rows=true, columns=predicted, labels `[0,1]`) were `[[1406,94],[86,1414]]`, `[[1412,88],[91,1409]]`, and `[[1417,83],[86,1414]]`.
+
+The representative seed is **202**, selected by median validation F1; exact F1 ties choose the smaller seed. All three models are preserved. These MLP validation scores are below the Phase 4 primary Logistic Regression and answer-only negative control scores. The strong answer-only control and documented answer-length and semantic-similarity differences remain serious shortcut concerns: these results alone do not establish context grounding, real-world generalization, or a final model ranking. No architecture or hyperparameters were changed in response to results.
+
+Artifacts:
+
+- `results/metrics/phase5_validation.json`: all seed metrics, thresholds, best epochs, aggregate mean/sample SD, selection policies, configuration, library versions, and provenance.
+- `results/metrics/phase5/seed_{101,202,303}_history.json`: complete epoch histories, tracked with the summary.
+- `results/figures/phase5_losses.png`: tracked training/validation loss curves for all seeds.
+- `checkpoints/phase5/mlp_seed_{101,202,303}.pt`: ignored independent best state dictionaries, thresholds, configuration, and compatibility metadata. Reload uses PyTorch's restricted `weights_only=True` loader and checks schema, preprocessing, scaler and input provenance.
+
+![Phase 5 training and validation loss curves](results/figures/phase5_losses.png)
+
+The existing encoder metadata records its revision as unavailable (`null`); Phase 5 preserves that limitation and does not reload the encoder. The run also emitted a nonfatal Matplotlib font-cache permission warning; the loss figure was generated successfully. Phase 5 stops at validation: final test evaluation, shuffled-context analysis, and qualitative error analysis remain future phases.
 
 Repository structure
 --------------------
