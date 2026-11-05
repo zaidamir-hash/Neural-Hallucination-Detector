@@ -55,6 +55,18 @@ mlp:
 training:
   primary_metric: hallucinated_f1
 
+baselines:
+  c_grid: [0.01, 0.1, 1.0, 10.0]
+  random_state: 42
+  solver: lbfgs
+  max_iter: 5000
+  tol: 0.00001
+  blas_threads: 1
+  cosine_directions: [lower, higher]
+  phase3_commit: "74c5587214bdd0f57000975442aea145239e803b"
+  checkpoint_dir: checkpoints/phase4
+  report_path: results/metrics/phase4_validation.json
+
 notes:
   - "Primary feature vector = 4 * 384 + 7 = 1543"
   - "Encoder remains frozen. Do not fine-tune the sentence-transformer model."

@@ -53,7 +53,7 @@ TBD
 
 Reproduction instructions
 ------------------------
-See configs/default.yaml for the canonical configuration, and tests/ for Phase 0, 1, 2, and 3 validation checks.
+See configs/default.yaml for the canonical configuration, and tests/ for Phase 0–4 validation checks.
 
 Environment setup
 -----------------
@@ -145,9 +145,34 @@ Train-only semantic-similarity audit (Phase 3)
 ---------------------------------------------
 `python scripts/audit_train_similarity.py` compares the unscaled maximum answer-context-chunk cosine by label using only `data/features/train/features.npy` and training labels. It writes aggregate counts, means, population standard deviations, quartiles, and ranges to `results/metrics/halueval_train_semantic_audit.json` and a comparison histogram to `results/figures/train_answer_context_cosine.png`.
 
-After normalized regeneration, each training class contains 7,000 examples. Grounded answers have mean cosine 0.3611 (median 0.3731; population SD 0.2111), while hallucinated answers have mean 0.5628 (median 0.5838; population SD 0.1882). Hallucinated answers therefore have higher similarity on average in this training split, contrary to the cosine baseline's expected direction. The distributions overlap substantially; the earlier answer-length differences are a possible contributing benchmark artifact, not an established explanation. The prescribed cosine direction and feature design remain unchanged.
+After normalized regeneration, each training class contains 7,000 examples. Grounded answers have mean cosine 0.3611 (median 0.3731; population SD 0.2111), while hallucinated answers have mean 0.5628 (median 0.5838; population SD 0.1882). Hallucinated answers therefore have higher similarity on average in this training split, contrary to the cosine baseline's original expected direction. The distributions overlap substantially; the earlier answer-length differences are a possible contributing benchmark artifact, not an established explanation. The feature design remains unchanged; the user subsequently authorized validation-only selection between both cosine directions in Phase 4.
 
 This descriptive audit does not calculate test performance or change the locked feature design. Differences may reflect grounding and benchmark shortcuts; they do not establish causality or generalization.
+
+Phase 4 baselines and negative control (validation only)
+-------------------------------------------------------
+Run from the repository root: `.venv\Scripts\python.exe scripts/run_phase4.py`.
+Run all tests: `.venv\Scripts\python.exe -m pytest tests -q`.
+
+The Phase 4 workflow opens training and validation features only (14,000 and 3,000 paired examples, respectively). It refuses test split inputs. Training rows fit the models; validation alone selects cosine direction/threshold, Logistic Regression regularization, and probability thresholds. No model is refitted on combined train/validation data. These are selection-set results, not final test estimates.
+
+- Cosine: unscaled `max_answer_context_cosine` at column 1536. Both directions are searched as explicitly authorized after the training audit. The selected rule is **Hallucinated when similarity >= 0.2736169099807739**, with continuous score equal to similarity for ROC-AUC. Selecting the higher-similarity direction may reflect HaluEval construction artifacts; it does not establish a general rule about grounding.
+- Primary Logistic Regression: L2, shared saved scaled 1,543 features, `C` in `[0.01, 0.1, 1, 10]`, no class weights, deterministic `lbfgs`, seed 42, maximum 5,000 iterations, tolerance `1e-5`, one BLAS thread. Selected `C=0.01`, probability threshold `0.48363664746284485`.
+- Negative control: separate L2 Logistic Regression with answer character count, whitespace-token count, lightweight sentence count, numeric-token presence/count, and Unicode punctuation count. Features use original processed answer strings. A separate StandardScaler fits on training control features only. Question/context data, semantic features, coverage, and IDs are excluded as predictors. Selected `C=0.01`, probability threshold `0.46458989417782254`. This diagnostic is not a primary model.
+
+Thresholds use `score >= threshold`; lower-cosine direction uses `score=-similarity`, equivalent to `similarity <= threshold`. Candidates are distinct validation scores, a reference (0.5 for probabilities, 0 for signed cosine), and the next representable value above the maximum. Ties prefer proximity to the reference, then smaller threshold. Direction ties prefer the original lower-similarity direction. Logistic model selection orders by highest validation F1, highest validation ROC-AUC, smaller C, threshold closest to 0.5, then smaller threshold.
+
+| Approach (validation only) | Accuracy | Precision (1) | Recall (1) | F1 (1) | ROC-AUC |
+|---|---:|---:|---:|---:|---:|
+| Cosine | 0.6457 | 0.5948 | 0.9140 | 0.7206 | 0.7542 |
+| Primary Logistic Regression | 0.9493 | 0.9469 | 0.9520 | 0.9495 | 0.9889 |
+| Answer-only negative control | 0.9537 | 0.9516 | 0.9560 | 0.9538 | 0.9767 |
+
+All eight Logistic Regression candidate fits converged. Primary iterations for C `[0.01, 0.1, 1, 10]`: `[35, 60, 109, 132]`; control iterations: `[16, 19, 22, 25]`. Continuous probabilities, not thresholded predictions, determine Logistic Regression ROC-AUC.
+
+The strong answer-only result, together with the large answer-length difference (Phase 1 token means approximately 2.22 versus 10.99), is a serious benchmark shortcut concern. High validation performance cannot be attributed solely to context grounding. These results do not establish real-world hallucination detection or a final model ranking.
+
+Tracked configuration, complete C searches, cosine direction search, validation metrics/confusion matrices, control feature schema/scaler parameters, library versions, and input provenance are in `results/metrics/phase4_validation.json`. Fitted estimators, both scaler parameter sets, and selected rules are saved without raw text in ignored `checkpoints/phase4/baselines.joblib`. Only trusted local joblib checkpoints should be loaded; the loader checks feature schema and preprocessing compatibility. No final test evaluation, MLP, shuffled-context evaluation, or error analysis has been run in Phase 4.
 
 Repository structure
 --------------------
