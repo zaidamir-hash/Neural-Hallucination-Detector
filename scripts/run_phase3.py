@@ -27,6 +27,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from hallucination_detector.features.pipeline import run_phase3_pipeline
 from hallucination_detector.features.encoder import FrozenEncoder
+from hallucination_detector.reproduction import WORKSPACE
 
 logging.basicConfig(
     level=logging.INFO,
@@ -43,11 +44,14 @@ def main() -> None:
         action="store_true",
         help="Explicitly replace all embedding caches before rebuilding features",
     )
+    parser.add_argument("--encoder-revision", help="Full Hugging Face model commit SHA")
     args = parser.parse_args()
+    if (ROOT / WORKSPACE).is_file() and not args.encoder_revision:
+        parser.error("--encoder-revision is required in an independent workspace")
 
     logger.info("Starting Phase 3 pipeline")
     logger.info("Loading frozen encoder...")
-    encoder = FrozenEncoder()
+    encoder = FrozenEncoder(revision=args.encoder_revision)
 
     results = run_phase3_pipeline(
         encoder=encoder,

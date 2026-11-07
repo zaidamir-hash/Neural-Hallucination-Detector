@@ -1,0 +1,14 @@
+# Observed direct dependency versions, Windows AMD64 / CPython 3.12.0.
+# Use with requirements.txt; not a universal or transitive lock.
+numpy==2.5.3
+pandas==3.0.5
+scikit-learn==1.9.0
+matplotlib==3.11.1
+PyYAML==6.0.3
+sentence-transformers==6.0.1
+torch==2.14.0
+transformers==5.16.1
+joblib==1.6.0
+threadpoolctl==3.6.0
+tqdm==4.70.0
+pytest==9.1.1

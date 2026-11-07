@@ -5,11 +5,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "neural-hallucination-detector"
 version = "0.0.0"
-description = "Neural Hallucination Detector (research experiment) - Phase 0"
+description = "Frozen-embedding hallucination detection on paired HaluEval QA"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 authors = [
   { name = "Copilot CLI" }
 ]
-# Keep dependencies empty here to avoid duplication with requirements.txt
-dependencies = []
+# Keep one dependency list for pip and editable package installation.
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -18,12 +18,22 @@ from hallucination_detector.config import load_config
 from hallucination_detector.data.split_phase2 import _context_group_id, deterministic_example_id
 from hallucination_detector.data.validate import compute_source_id
 from hallucination_detector.features.scaler import load_scaler, transform_with_scaler
-from hallucination_detector.mlp import load_checkpoint
+from hallucination_detector.mlp import load_checkpoint, summarize_runs
+from hallucination_detector.reproduction import WORKSPACE
 from hallucination_detector.mlp_pipeline import load_phase5_inputs, write_json
 
 METRICS = ("accuracy", "precision", "recall", "f1", "roc_auc")
 LOCK_PATH = "results/metrics/phase6/evaluation_manifest.json"
 SMOKE_PATH = "results/metrics/phase6/development_smoke.json"
+
+
+def validation_representative(root: Path, phase5: dict) -> int:
+    """Check the report against the run's validation selection policy."""
+    expected = (summarize_runs(phase5["runs"])["representative_seed"]
+                if (root / WORKSPACE).is_file() else 202)
+    if phase5["summary"]["representative_seed"] != expected:
+        raise ValueError("Representative seed disagrees with validation selection")
+    return expected
 
 
 def load_fixed_models(root: Path, phase4: dict, phase5: dict) -> dict:
@@ -52,9 +62,9 @@ def load_fixed_models(root: Path, phase4: dict, phase5: dict) -> dict:
     if baseline["cosine"] != phase4["cosine"]["selected"]:
         raise ValueError("Cosine rule disagrees with report")
     if (phase5["seeds"] != config["mlp_seeds"]
-            or [r["seed"] for r in phase5["runs"]] != config["mlp_seeds"]
-            or phase5["summary"]["representative_seed"] != 202):
-        raise ValueError("Expected all three seeds and validation-selected representative 202")
+            or [r["seed"] for r in phase5["runs"]] != config["mlp_seeds"]):
+        raise ValueError("Expected all three configured MLP seeds")
+    validation_representative(root, phase5)
     mlps = {}
     for run in phase5["runs"]:
         path = root / run["checkpoint_path"]
@@ -161,6 +171,8 @@ def prepare_evaluation(root: Path) -> dict:
     paths.update(p.relative_to(root).as_posix() for p in (root / "src/hallucination_detector").rglob("*.py"))
     paths.update(p.relative_to(root).as_posix() for p in (root / "tests").glob("test*.py"))
     paths.add("scripts/run_phase6.py")
+    if (root / WORKSPACE).is_file():
+        paths.add(WORKSPACE)
     paths.update(f"data/embedding_cache/cache_metadata_{v}.json" for v in ("questions", "answers", "contexts", "chunks"))
     manifest = {"phase": 6, "status": "locked before test input access", "compatibility": compatibility,
                 "decisions": decisions, "input_checksums": {p: _sha(root / p) for p in sorted(paths)},

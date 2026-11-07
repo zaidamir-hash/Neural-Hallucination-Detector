@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from importlib.metadata import version
 from pathlib import Path
 import platform
-import subprocess
+import subprocess  # Shared with source_commit; legacy callers patch this module.
 
 import numpy as np
 import torch
@@ -21,6 +21,7 @@ from hallucination_detector.evaluation import (
 )
 from hallucination_detector.features.scaler import transform_with_scaler
 from hallucination_detector.mlp_pipeline import write_json
+from hallucination_detector.reproduction import source_commit
 
 OUTPUT = "results/metrics/phase6"
 
@@ -29,9 +30,9 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def result_label(result: dict) -> str:
+def result_label(result: dict, representative: int = 202) -> str:
     if result["model"] == "mlp":
-        return f"MLP seed {result['seed']}" + (" (representative)" if result["seed"] == 202 else "")
+        return f"MLP seed {result['seed']}" + (" (representative)" if result["seed"] == representative else "")
     return {"cosine": "Cosine", "primary_logistic": "Primary Logistic Regression",
             "negative_control": "Answer-only negative control (separate diagnostic)"}[result["model"]]
 
@@ -40,13 +41,13 @@ def without_scores(results: list[dict]) -> list[dict]:
     return [{k: v for k, v in r.items() if k != "scores"} for r in results]
 
 
-def comparison_table(results: list[dict], summary: dict) -> str:
+def comparison_table(results: list[dict], summary: dict, representative: int = 202) -> str:
     lines = ["| Approach (final test) | Accuracy | Precision (1) | Recall (1) | F1 (1) | ROC-AUC |",
              "|---|---:|---:|---:|---:|---:|"]
     for result in results:
         if result["model"] == "negative_control":
             continue
-        lines.append("| " + result_label(result) + " | " + " | ".join(f"{result['metrics'][k]:.6f}" for k in METRICS) + " |")
+        lines.append("| " + result_label(result, representative) + " | " + " | ".join(f"{result['metrics'][k]:.6f}" for k in METRICS) + " |")
     for name, field in (("MLP three-seed mean", "mean"), ("MLP sample SD (ddof=1)", "sample_sd")):
         lines.append("| " + name + " | " + " | ".join(f"{summary['metrics'][k][field]:.6f}" for k in METRICS) + " |")
     control = next(r for r in results if r["model"] == "negative_control")
@@ -57,8 +58,8 @@ def comparison_table(results: list[dict], summary: dict) -> str:
     return "\n".join(lines)
 
 
-def plot_evaluation(root: Path, labels: np.ndarray, results: list[dict]) -> list[str]:
-    """All run confusion matrices; representative 202 only for MLP ROC/PR curves."""
+def plot_evaluation(root: Path, labels: np.ndarray, results: list[dict], representative: int = 202) -> list[str]:
+    """All run confusion matrices; the validation-selected representative only for MLP ROC/PR curves."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -75,25 +76,25 @@ def plot_evaluation(root: Path, labels: np.ndarray, results: list[dict]) -> list
             ax.text(j, i, str(count), ha="center", va="center", color="white" if count > cm.max()/2 else "black")
         ax.set(xticks=[0, 1], yticks=[0, 1], xticklabels=["Grounded", "Hallucinated"],
                yticklabels=["Grounded", "Hallucinated"], xlabel="Predicted", ylabel="True",
-               title=result_label(result).replace(" (separate diagnostic)", "\n(separate diagnostic)"))
+               title=result_label(result, representative).replace(" (separate diagnostic)", "\n(separate diagnostic)"))
     fig.suptitle("Locked final test confusion matrices: [[TN, FP], [FN, TP]]")
     fig.tight_layout()
     fig.savefig(directory / "confusion_matrices.png", dpi=150)
     plt.close(fig)
     paths.append("results/figures/phase6/confusion_matrices.png")
-    selected = [r for r in results if r["model"] != "mlp" or r["seed"] == 202]
+    selected = [r for r in results if r["model"] != "mlp" or r["seed"] == representative]
     for kind in ("roc", "precision_recall"):
         fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharex=True, sharey=True)
         for result in selected:
             ax = axes[int(result["model"] == "negative_control")]
             if kind == "roc":
                 x, y, _ = roc_curve(labels, result["scores"], pos_label=1)
-                label = f"{result_label(result)}; AUC={result['metrics']['roc_auc']:.4f}"
+                label = f"{result_label(result, representative)}; AUC={result['metrics']['roc_auc']:.4f}"
             else:
                 y, x, _ = precision_recall_curve(labels, result["scores"], pos_label=1)
-                label = result_label(result)
+                label = result_label(result, representative)
             ax.plot(x, y, label=label)
-        for ax, title in zip(axes, ("Three primary approaches (MLP seed 202)", "Separate answer-only negative control")):
+        for ax, title in zip(axes, (f"Three primary approaches (MLP seed {representative})", "Separate answer-only negative control")):
             if kind == "roc":
                 ax.plot([0, 1], [0, 1], "--", color="gray")
             else:
@@ -113,6 +114,7 @@ def plot_evaluation(root: Path, labels: np.ndarray, results: list[dict]) -> list
 def run_final_evaluation(root: Path) -> dict:
     """Persist primary outputs before shuffling; refuse to overwrite any prior attempt."""
     manifest = verify_lock(root)
+    representative = manifest["decisions"]["representative_mlp_seed"]
     output = root / OUTPUT
     attempt = output / "execution.json"
     if attempt.exists() or (output / "primary_metrics.json").exists():
@@ -123,8 +125,7 @@ def run_final_evaluation(root: Path) -> dict:
     torch.use_deterministic_algorithms(True)
     execution = {"status": "started", "started_utc": _now(), "planned_evaluation_number": 1, "reruns": [],
                  "evaluation_manifest_checksum": _sha(root / LOCK_PATH),
-                 "starting_commit": subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True,
-                                                   text=True, check=True).stdout.strip(),
+                 "starting_commit": source_commit(root),
                  "versions": {"python": platform.python_version(), **{p: version(p) for p in (
                      "numpy", "torch", "scikit-learn", "matplotlib", "sentence-transformers")}},
                  "runtime": {"device": "cpu", "torch_threads": 1, "blas_threads": 1,
@@ -148,13 +149,13 @@ def run_final_evaluation(root: Path) -> dict:
                    "label_counts": {str(k): int((data["labels"] == k).sum()) for k in (0, 1)},
                    "input_checksums": input_checksums, "feature_reconstruction_exact": True,
                    "results": without_scores(results), "mlp_three_seed_summary": summary,
-                   "representative_mlp_seed": 202, "metric_definitions": manifest["metric_definitions"],
+                   "representative_mlp_seed": representative, "metric_definitions": manifest["metric_definitions"],
                    "negative_control_role": "Separate answer-only diagnostic, not a primary model",
-                   "qualitative_handoff": {"model": "mlp", "seed": 202, "predictions": f"{OUTPUT}/primary_predictions.csv",
+                   "qualitative_handoff": {"model": "mlp", "seed": representative, "predictions": f"{OUTPUT}/primary_predictions.csv",
                                            "analysis_performed": False}}
         persist_predictions(output / "primary_predictions.csv", data, results)
-        primary["figures"] = plot_evaluation(root, data["labels"], results)
-        (output / "comparison.md").write_text(comparison_table(results, summary), encoding="utf-8")
+        primary["figures"] = plot_evaluation(root, data["labels"], results, representative)
+        (output / "comparison.md").write_text(comparison_table(results, summary, representative), encoding="utf-8")
         write_json(output / "primary_metrics.json", primary)
         primary_paths = [output / p for p in ("primary_metrics.json", "primary_predictions.csv", "comparison.md")]
         primary_paths.extend(root / p for p in primary["figures"])

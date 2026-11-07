@@ -7,6 +7,7 @@ L2-normalized embeddings with all parameters frozen.
 from __future__ import annotations
 
 import logging
+import re
 from typing import List, Optional
 
 import numpy as np
@@ -32,6 +33,7 @@ class FrozenEncoder:
         model_name: str = MODEL_NAME,
         batch_size: int = 64,
         device: Optional[str] = None,
+        revision: Optional[str] = None,
     ) -> None:
         from sentence_transformers import SentenceTransformer
 
@@ -41,16 +43,19 @@ class FrozenEncoder:
         self._batch_size = batch_size
         self._model_name = model_name
 
-        self._model = SentenceTransformer(model_name, device=device)
+        if revision is not None and not re.fullmatch(r"[0-9a-f]{40}", revision):
+            raise ValueError("Encoder revision must be a full lowercase commit SHA")
+        options = {"revision": revision} if revision is not None else {}
+        self._model = SentenceTransformer(model_name, device=device, **options)
 
         # Freeze all parameters
         for param in self._model.parameters():
             param.requires_grad = False
         self._model.eval()
 
-        self._revision: Optional[str] = None
+        self._revision: Optional[str] = revision
         try:
-            self._revision = getattr(self._model, "_model_card_vars", {}).get(
+            self._revision = revision or getattr(self._model, "_model_card_vars", {}).get(
                 "model_revision", None
             )
         except Exception:

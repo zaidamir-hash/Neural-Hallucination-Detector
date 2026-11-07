@@ -8,6 +8,7 @@ import math
 from pathlib import Path
 
 from hallucination_detector.data.acquire import compute_sha256_bytes
+from hallucination_detector.reproduction import REFERENCE, WORKSPACE
 
 MODEL = "mlp"
 SEED = 202
@@ -37,11 +38,11 @@ def write_json(path: Path, value) -> None:
 
 
 def select_errors(predictions: list[dict], examples: list[dict], threshold: float,
-                  limit: int = LIMIT) -> tuple[list[dict], dict]:
+                  limit: int = LIMIT, *, seed: int = SEED) -> tuple[list[dict], dict]:
     """Join all original representative predictions before ranking benchmark errors."""
     if not math.isfinite(threshold) or not 0 <= threshold <= 1 or limit < 0:
         raise ValueError("Invalid threshold or selection limit")
-    chosen = [r for r in predictions if r["model"] == MODEL and str(r["seed"]) == str(SEED)]
+    chosen = [r for r in predictions if r["model"] == MODEL and str(r["seed"]) == str(seed)]
     ids = [r["example_id"] for r in examples]
     prediction_ids = [r["example_id"] for r in chosen]
     if (not examples or len(set(ids)) != len(ids) or
@@ -74,7 +75,7 @@ def select_errors(predictions: list[dict], examples: list[dict], threshold: floa
             "hallucination_score": score, "threshold": threshold,
             "score_minus_threshold": score - threshold,
             "absolute_distance": abs(score - threshold),
-            "model": MODEL, "seed": SEED, "question": example["question"],
+            "model": MODEL, "seed": seed, "question": example["question"],
             "candidate_answer": example["candidate_answer"],
             "reference_context": example["reference_context"],
         })
@@ -113,7 +114,7 @@ def attach_reviews(selected: list[dict], notes: list[dict]) -> list[dict]:
 def render_report(rows: list[dict], manifest: dict, counts: dict) -> str:
     """Render the same reviewed records in a readable report."""
     lines = ["# Phase 7 qualitative error analysis", "", manifest["scope"], "",
-             f"Model: MLP seed {SEED}; locked validation threshold: {manifest['threshold']!r}.", "",
+             f"Model: MLP seed {manifest['seed']}; locked validation threshold: {manifest['threshold']!r}.", "",
              f"Saved confusion matrix [[TN, FP], [FN, TP]]: {manifest['confusion_matrix']}. "
              f"Available errors: {manifest['available']}; reviewed: {manifest['reviewed']}.", "",
              manifest["selection_policy"], "", "## Findings and limits", "",
@@ -163,6 +164,22 @@ def render_report(rows: list[dict], manifest: dict, counts: dict) -> str:
     return "\n".join(line.rstrip() for line in "\n".join(lines).split("\n"))
 
 
+def match_historical_reviews(selected: list[dict], notes: list[dict], historical: list[dict]) -> list[dict] | None:
+    """Reuse reviews only for the same cases, text, decisions and evidence."""
+    original = {row["example_id"]: row for row in historical}
+    if len(original) != len(historical) or set(original) != {row["example_id"] for row in selected}:
+        return None
+    try:
+        reviewed = attach_reviews(selected, notes)
+    except ValueError:
+        return None
+    fields = ("source_id", "question", "candidate_answer", "true_label", "predicted_label",
+              "error_type", "context_excerpts", "categories", "judgment", "analyst_explanation")
+    if any(row[field] != original[row["example_id"]].get(field) for row in reviewed for field in fields):
+        return None
+    return reviewed
+
+
 def export_phase7(root: Path, notes_path: Path) -> dict:
     """Verify provenance, select fixed errors, validate reviews and export only Phase 7 files."""
     metrics = read_json(root / PHASE6 / "primary_metrics.json")
@@ -180,31 +197,48 @@ def export_phase7(root: Path, notes_path: Path) -> dict:
     validation_path = "results/metrics/phase5_validation.json"
     if checksum(root / validation_path) != lock["input_checksums"][validation_path]:
         raise ValueError("Validation report checksum mismatch")
-    if validation["summary"]["representative_seed"] != SEED or metrics["representative_mlp_seed"] != SEED:
+    independent = (root / WORKSPACE).is_file()
+    seed = lock["decisions"]["representative_mlp_seed"] if independent else SEED
+    if validation["summary"]["representative_seed"] != seed or metrics["representative_mlp_seed"] != seed:
         raise ValueError("Representative seed mismatch")
-    threshold = next(r["threshold"] for r in validation["runs"] if r["seed"] == SEED)
-    result = next(r for r in metrics["results"] if r["model"] == MODEL and r["seed"] == SEED)
+    threshold = next(r["threshold"] for r in validation["runs"] if r["seed"] == seed)
+    result = next(r for r in metrics["results"] if r["model"] == MODEL and r["seed"] == seed)
     if result["threshold"] != threshold:
         raise ValueError("Locked threshold mismatch")
     with (root / PHASE6 / "primary_predictions.csv").open(encoding="utf-8", newline="") as handle:
         predictions = list(csv.DictReader(handle))
     examples = [json.loads(line) for line in (root / PROCESSED).read_text(encoding="utf-8").splitlines() if line.strip()]
-    selected, summary = select_errors(predictions, examples, threshold)
+    selected, summary = select_errors(predictions, examples, threshold, seed=seed)
     if summary["confusion_matrix"] != result["metrics"]["confusion_matrix"] or len(examples) != metrics["row_count"]:
         raise ValueError("Saved confusion matrix/row count mismatch")
-    rows = attach_reviews(selected, read_json(notes_path))
-    manifest = {"schema_version": "1.0.0", "model": MODEL, "seed": SEED, "threshold": threshold,
+    manifest = {"schema_version": "1.0.0", "model": MODEL, "seed": seed, "threshold": threshold,
                 "limit_per_error_type": LIMIT, **summary,
                 "scope": "Original final-test saved predictions only; no inference, training, tuning or changed decisions.",
                 "selection_policy": "FP: true 0, predicted 1, score descending. FN: true 1, predicted 0, score ascending. "
                                     "Both: example_id ascending for equal scores; first 10 or all available if fewer. "
                                     "Predicted Hallucinated iff score >= locked validation threshold.",
                 "score_interpretation": "Extreme model scores; not calibrated probabilities or proven confidence",
-                "selected_example_ids": [r["example_id"] for r in rows],
+                "selected_example_ids": [r["example_id"] for r in selected],
                 "input_checksums": {p: checksum(root / p) for p in (
                     PHASE6 + "primary_predictions.csv", PHASE6 + "primary_metrics.json",
                     PHASE6 + "evaluation_manifest.json", PHASE6 + "primary_saved.json", PROCESSED, validation_path)},
                 "analyst_notes_checksum": checksum(notes_path)}
+    if independent:
+        historical = read_json(root / REFERENCE / "reviewed_cases.json")
+        rows = match_historical_reviews(selected, read_json(notes_path), historical)
+        out = root / OUTPUT
+        out.mkdir(parents=True)
+        manifest["review_candidates"] = summary["reviewed"]
+        manifest["review_status"] = "historical_notes_matched" if rows is not None else "fresh_analyst_review_required"
+        if rows is None:
+            manifest["reviewed"] = {"FP": 0, "FN": 0}
+        write_json(out / "selection.json", manifest)
+        write_json(out / "review_candidates.json", selected)
+        if rows is not None:
+            write_json(out / "reviewed_cases.json", rows)
+        return manifest
+
+    rows = attach_reviews(selected, read_json(notes_path))
     counts = {"categories": {}, "judgments": dict(Counter(r["judgment"] for r in rows))}
     for category in CATEGORIES:
         c = {kind: sum(category in r["categories"] for r in rows if r["error_type"] == kind) for kind in ("FP", "FN")}

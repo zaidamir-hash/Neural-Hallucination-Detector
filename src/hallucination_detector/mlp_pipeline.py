@@ -5,7 +5,7 @@ from importlib.metadata import version
 import json
 from pathlib import Path
 import platform
-import subprocess
+import subprocess  # Shared with source_commit; legacy callers patch this module.
 from typing import Any
 
 import numpy as np
@@ -15,6 +15,7 @@ from hallucination_detector.baselines.pipeline import (
     _json, _sha, load_development_split, schema_fingerprint,
 )
 from hallucination_detector.config import load_config
+from hallucination_detector.reproduction import source_commit
 from hallucination_detector.features.preprocessing import PREPROCESSING_VERSION
 from hallucination_detector.features.scaler import load_scaler, transform_with_scaler
 from hallucination_detector.features.schema import load_feature_schema
@@ -146,7 +147,7 @@ def run_phase5(root: Path = Path(".")) -> dict[str, Any]:
         run.update(history_path=history_path, checkpoint_path=checkpoint, checkpoint_checksum=_sha(root / checkpoint))
         runs.append(run)
         print(f"Seed {seed}: best epoch {run['best_epoch']}, validation F1={run['validation_metrics']['f1']:.6f}", flush=True)
-    git_head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
+    git_head = source_commit(root)
     report = {
         "phase": 5, "evaluation_split": "validation", "positive_class": 1,
         "confusion_matrix_order": "rows=true, columns=predicted; labels=[0,1]",
